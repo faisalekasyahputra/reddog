@@ -31,7 +31,7 @@ a{color:var(--link)}
 #desktop.on{opacity:1}
 .dicons{position:absolute;top:14px;left:14px;display:flex;flex-direction:column;gap:18px}
 .dicon{width:82px;text-align:center;color:#fff;cursor:pointer;user-select:none;text-shadow:1px 1px 0 rgba(120,30,0,.7)}
-.dicon svg{display:block;margin:0 auto;filter:drop-shadow(1px 1px 0 rgba(120,30,0,.4))}
+.dicon svg,.dicon img{display:block;margin:0 auto;filter:drop-shadow(1px 1px 0 rgba(120,30,0,.4))}
 .dicon span.lbl{display:inline-block;padding:1px 3px;margin-top:4px}
 .dicon:focus-visible span.lbl{background:rgba(255,255,255,.25);outline:1px dotted #fff}
 

@@ -492,7 +492,7 @@ void main(){
       <div id="desktop" className={bootStage === "done" ? "on" : ""}>
         <div className="dicons">
           {buyUrl && <div className="dicon" tabIndex={0} role="button" onClick={() => act("buy")} onKeyDown={(event) => onActionKey(event, "buy")}>
-            <Image src="/assets/icons/pump.png" width={32} height={32} alt="" /><span className="lbl">buy.exe</span>
+            <Image src="/assets/icons/pump.png" width={38} height={38} alt="" style={{ margin: "-3px auto" }} /><span className="lbl">buy.exe</span>
           </div>}
           <div className="dicon" tabIndex={0} role="button" onClick={() => act("ca")} onKeyDown={(event) => onActionKey(event, "ca")}>
             <svg width="32" height="32" viewBox="0 0 32 32"><use href="#i-doc" /></svg><span className="lbl">CA.txt</span>
