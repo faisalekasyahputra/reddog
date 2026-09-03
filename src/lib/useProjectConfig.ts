@@ -1,10 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-);
 
 export interface ProjectConfig {
   twitter_url: string;
@@ -19,15 +15,9 @@ export interface ProjectConfig {
   connection_status: string;
 }
 
-const BUY_BASE: Record<string, string> = {
-  pumpfun: "https://pump.fun/coin/",
-  jup: "https://jup.ag/swap/SOL-",
-};
-
-export function getBuyUrl(config: Pick<ProjectConfig, "buy_platform" | "contract_address"> | null) {
-  if (!config?.buy_platform || !config.contract_address) return null;
-  const base = BUY_BASE[config.buy_platform];
-  return base ? `${base}${config.contract_address}` : null;
+// ponytail: launched on PONS, so buy always goes to the PONS launchpad; buy_platform is ignored
+export function getBuyUrl(config: Pick<ProjectConfig, "contract_address"> | null) {
+  return config?.contract_address ? `https://ponsfamily.com/launchpad/${config.contract_address}` : null;
 }
 
 export function useProjectConfig() {
@@ -35,7 +25,7 @@ export function useProjectConfig() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase
+    createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
       .from("project_configs")
       .select("*, melly_projects!inner(slug)")
       .eq("melly_projects.slug", process.env.NEXT_PUBLIC_PROJECT_SLUG)

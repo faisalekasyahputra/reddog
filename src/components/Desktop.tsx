@@ -398,7 +398,7 @@ void main(){
     else if (action === "buy") {
       if (!buyUrl) return setStatus("Buy not live yet. patience.");
       openExternal(buyUrl);
-      setStatus(`Opening ${config?.buy_platform} ...`);
+      setStatus("Opening PONS launchpad ...");
     } else if (action === "tg") {
       if (telegramUrl) openExternal(telegramUrl);
     } else if (action === "community") {
@@ -492,7 +492,7 @@ void main(){
       <div id="desktop" className={bootStage === "done" ? "on" : ""}>
         <div className="dicons">
           {buyUrl && <div className="dicon" tabIndex={0} role="button" onClick={() => act("buy")} onKeyDown={(event) => onActionKey(event, "buy")}>
-            <Image src="/assets/icons/pump.png" width={38} height={38} alt="" style={{ margin: "-3px auto" }} /><span className="lbl">buy.exe</span>
+            <Image src="/assets/icons/pons.png" width={38} height={38} alt="" style={{ margin: "-3px auto" }} /><span className="lbl">buy.exe</span>
           </div>}
           <div className="dicon" tabIndex={0} role="button" onClick={() => act("ca")} onKeyDown={(event) => onActionKey(event, "ca")}>
             <svg width="32" height="32" viewBox="0 0 32 32"><use href="#i-doc" /></svg><span className="lbl">CA.txt</span>
@@ -539,7 +539,7 @@ void main(){
                   <div className="sechead"><h2>LORE</h2><div className="rule" /></div>
                   <p className="dropcap">Snoo has worked the front page since 2005. Twenty-one years greeting every lurker at the door — through the blackouts, the API wars, the IPO roadshow — always smiling, always the same blank white face. Total compensation to date: zero dollars, zero shares, one antenna.</p>
                   <p>Then the bell rang on Wall Street and the mascot checked the cap table. Founders: on it. Funds: on it. The face of the entire website: on a sticker sheet in the merch store, marked down 30%.</p>
-                  <p>So the mascot went DeFi. $SNOOFI is Snoo&apos;s self-issued severance — the mascot of the front page, unofficially on-chain, where no admin can delete it and no board can dilute it. The antenna finally picks up something useful: liquidity. LP burned. Mint revoked. Smile permanent.</p>
+                  <p>So the mascot went DeFi. $SNOOFI is Snoo&apos;s self-issued severance — launched on PONS, paired with $RDDT, unofficially on-chain where no admin can delete it and no board can dilute it. Every trading fee is paid out to holders as $RDDT. 100% to holders, 0% to the boardroom. The antenna finally picks up something useful: yield.</p>
                   <p className="sig">the mascot is free. the mascot is financial.</p>
                 </section>
 
@@ -614,7 +614,7 @@ void main(){
             <div className="titlebar" onPointerDown={(event) => beginDrag(event, dialog.id)} onPointerMove={moveDrag} onPointerUp={endDrag} onPointerCancel={endDrag}><span className="ttext">{dialog.kind === "ca" ? "CA.txt — Notepad" : dialog.kind === "howto" ? "How to buy — Wizard" : "Recycle Bin"}</span><button type="button" className="tbtn" aria-label="Close" onClick={() => closeDialog(dialog.id)}>X</button></div>
             <div className="content2">
               {dialog.kind === "ca" && <><div className="dialog-copy">official $SNOOFI contract address:</div><div className="ca-field sunken wrap-ca">{caLabel}</div><div className="dialog-note">verify on DexScreener before buying. always.</div></>}
-              {dialog.kind === "howto" && <><div className="stepline"><div className="n">1</div><div>get a Solana wallet (Phantom works)</div></div><div className="stepline"><div className="n">2</div><div>load it with SOL from any exchange</div></div><div className="stepline"><div className="n">3</div><div>paste the CA into pump.fun or your DEX</div></div><div className="stepline"><div className="n">4</div><div>swap. hold. do not check the chart hourly (you will)</div></div></>}
+              {dialog.kind === "howto" && <><div className="stepline"><div className="n">1</div><div>get a Robinhood wallet</div></div><div className="stepline"><div className="n">2</div><div>load it with $RDDT (the pair)</div></div><div className="stepline"><div className="n">3</div><div>paste the CA into the PONS launchpad</div></div><div className="stepline"><div className="n">4</div><div>swap. hold. do not check the chart hourly (you will)</div></div></>}
               {dialog.kind === "recycle" && <div>contents: <b>all of the fud</b> (permanently deleted)</div>}
             </div>
             <div className="btnrow">
@@ -636,7 +636,7 @@ void main(){
       <div className={`win${startOpen ? " open" : ""}`} id="startmenu">
         <div className="rail">$SNOOFI&nbsp;98</div>
         <div className="items">
-          {buyUrl && <button type="button" className="item" onClick={() => act("buy")}><Image className="start-cart" src="/assets/icons/pump.png" width={18} height={18} alt="" /><span>Buy $SNOOFI</span></button>}
+          {buyUrl && <button type="button" className="item" onClick={() => act("buy")}><Image className="start-cart" src="/assets/icons/pons.png" width={18} height={18} alt="" /><span>Buy $SNOOFI</span></button>}
           <button type="button" className="item" onClick={() => act("copyca")}><span className="start-ca">CA</span><span>Copy CA</span></button>
           <button type="button" className="item" onClick={() => act("howto")}><b>?</b><span>How to buy (wizard)</span></button>
           <button type="button" className="item" onClick={() => act("tg")}><b>TG</b><span>Telegram</span></button>
