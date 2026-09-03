@@ -642,7 +642,7 @@ void main(){
       </div>
 
       <div className={`win${startOpen ? " open" : ""}`} id="startmenu">
-        <div className="rail">$SNOOFI&nbsp;98</div>
+        <div className="rail">$SNOOFI</div>
         <div className="items">
           {buyUrl && <button type="button" className="item" onClick={() => act("buy")}><Image className="start-ico" src="/assets/icons/pons.png" width={22} height={22} alt="" /><span>Buy $SNOOFI</span></button>}
           <button type="button" className="item" onClick={() => act("copyca")}><span className="start-ca">CA</span><span>Copy CA</span></button>
