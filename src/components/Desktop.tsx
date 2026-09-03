@@ -540,7 +540,7 @@ void main(){
               <div className="content">
                 <section id="sec-top">
                   <div className="slot hero sunken">
-                    <div className="ph"><svg width="70" height="61" viewBox="0 0 110 96" opacity="0.5"><use href="#i-snoo" /></svg><div className="big">HERO IMAGE</div><div>drop assets/hero.png — wide format, ~1600 x 900</div></div>
+                    <Image src="/assets/hero-snoofi-wave.avif" alt="Snoofi surfing beneath a towering ocean wave" width={1672} height={941} priority sizes="(max-width: 780px) 100vw, 900px" />
                   </div>
                 </section>
 
