@@ -136,7 +136,7 @@ section{margin-bottom:26px}
 #tray{margin-left:auto;display:flex;align-items:center;gap:7px;padding:2px 9px;box-shadow:inset -1px -1px 0 var(--hilite),inset 1px 1px 0 var(--shadow)}
 #startmenu{position:fixed;left:2px;bottom:32px;z-index:600;width:210px;display:none;padding:3px}
 #startmenu.open{display:flex;flex-direction:row;align-items:stretch}
-#startmenu .rail{background:linear-gradient(180deg,var(--title-b),var(--title-a));color:#fff;flex:0 0 26px;display:flex;align-items:flex-end;justify-content:center;padding:8px 0;font-weight:bold;letter-spacing:1px;writing-mode:vertical-rl;transform:rotate(180deg);font-size:14px}
+#startmenu .rail{background:linear-gradient(180deg,var(--title-b),var(--title-a));color:#fff;flex:0 0 26px;display:flex;align-items:center;justify-content:center;padding:8px 0;font-weight:bold;letter-spacing:1px;writing-mode:vertical-rl;transform:rotate(180deg);font-size:14px}
 #startmenu .items{flex:1;display:flex;flex-direction:column}
 #startmenu .item{display:flex;width:100%;align-items:center;gap:9px;padding:6px 9px;cursor:pointer;background:transparent;box-shadow:none;color:inherit;text-align:left}
 #startmenu .item:active{padding:6px 9px;box-shadow:none}
