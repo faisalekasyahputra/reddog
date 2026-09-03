@@ -88,7 +88,6 @@ section{margin-bottom:26px}
 .slot.vid{aspect-ratio:16/9}
 .lore p{font-size:12px;line-height:1.7;max-width:64ch;margin-bottom:10px}
 .lore .dropcap::first-letter{font-size:34px;font-weight:bold;color:#ff4500;float:left;line-height:.85;padding-right:6px;font-style:italic}
-.lore .sig{color:var(--muted);font-style:italic}
 .scroller-wrap{display:flex;align-items:stretch;gap:4px}
 .scrollbtn{flex:0 0 26px;font-weight:bold;font-size:13px}
 .scroller{flex:1;overflow:hidden;padding:10px 0}

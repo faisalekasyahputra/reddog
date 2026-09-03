@@ -548,7 +548,6 @@ void main(){
                   <p className="dropcap">Snoofi is the Reddit Dog. Simple enough concept, but it&apos;s a bit deeper than that. A lot of crypto communities started on Reddit, and the prime example is Dogecoin. It was just a group of people with conviction, posting memes and buying a joke coin, and it grew into something that can&apos;t ever be replicated. Doge wasn&apos;t built in a day, and it wasn&apos;t built on Reddit alone, but it definitely has its home here.</p>
                   <p>Crypto has a home on Reddit. What Reddit doesn&apos;t have is a native crypto we can ALL rally behind. Think about that for a second. The site that birthed half of crypto culture never got its own coin. Meanwhile Snoofi has been sitting in the corner of every page for twenty years watching it all happen. The mascot was right there the whole time.</p>
                   <p>$SNOOFI launched on PONS paired with $RDDT, actual Reddit stock. All the trading fees get paid out to holders as $RDDT. 100% of them. Not some of them, not after the team takes a cut. All of them. You hold the dog, you stack the stock.</p>
-                  <p className="sig">the mascot is free. the mascot is financial.</p>
                 </section>
 
                 <section id="sec-video">
