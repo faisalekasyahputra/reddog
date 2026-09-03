@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { CSSProperties, KeyboardEvent, PointerEvent } from "react";
 import type { RedditData } from "@/lib/reddit";
-import { dexEmbedUrl, getBuyUrl, useProjectConfig } from "@/lib/useProjectConfig";
+import { getBuyUrl, useProjectConfig } from "@/lib/useProjectConfig";
 
 const memes = [
   "Two suited Snoofi mascots look down from an alley",
@@ -82,7 +82,6 @@ export default function Desktop({ subreddit }: { subreddit: string }) {
   const ca = config?.contract_address || "";
   const caLabel = ca || "Coming Soon";
   const buyUrl = getBuyUrl(config);
-  const chartEmbed = dexEmbedUrl(config?.dexscreener_url);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [muted, setMuted] = useState(true);
   const toggleMute = () => setMuted((current) => !current);
@@ -589,7 +588,6 @@ void main(){
                   <div className="contract-label">contract address</div><div className="ca-field sunken" id="ca-side">{caLabel}</div>
                   <button type="button" className="bigbtn" onClick={() => act("copyca")}>Copy CA</button>{buyUrl && <button type="button" className="bigbtn buy" onClick={() => act("buy")}>BUY $SNOOFI</button>}
                 </div></div>
-                {chartEmbed && <div className="sbox"><h3>$SNOOFI Chart</h3><div className="inner"><div className="chartwrap sunken"><iframe src={chartEmbed} title="$SNOOFI chart on DexScreener" loading="lazy" /></div></div></div>}
               </div>
             </div>
           </div>
@@ -598,7 +596,7 @@ void main(){
 
         <div className="win" id="community" style={windowStyle("community")} onPointerDown={() => bringToFront("community")}>
           <div className="titlebar" onPointerDown={(event) => beginDrag(event, "community")} onPointerMove={moveDrag} onPointerUp={endDrag} onPointerCancel={endDrag}>
-            <svg width="16" height="14" viewBox="0 0 110 96"><use href="#i-snoo" /></svg><span className="ttext" id="ctitlebar">r/{reddit?.community.name ?? subreddit} — Community Monitor</span><button type="button" className="tbtn" aria-label="Close" onClick={() => setWindowVisible("community", false)}>X</button>
+            <svg width="16" height="14" viewBox="0 0 110 96"><use href="#i-snoo" /></svg><span className="ttext" id="ctitlebar">Reddit Community</span><button type="button" className="tbtn" aria-label="Close" onClick={() => setWindowVisible("community", false)}>X</button>
           </div>
           <div className="menubar"><span><u>F</u>ile</span><span><u>V</u>iew</span><button type="button" className="menu-action" onClick={retryReddit}><u>R</u>efresh</button></div>
           <div className="winbody">
@@ -640,7 +638,7 @@ void main(){
       <div id="taskbar">
         <button type="button" id="startbtn" onClick={(event) => { event.stopPropagation(); setStartOpen((open) => !open); }}><svg width="16" height="14" viewBox="0 0 110 96"><use href="#i-snoo" /></svg>Start</button>
         <button type="button" className={`taskbtn${visible.browser ? " active" : ""}`} id="task-browser" onClick={() => toggleWindow("browser")}>$SNOOFI — Internet Explorer</button>
-        <button type="button" className={`taskbtn${visible.community ? " active" : ""}`} id="task-community" onClick={() => toggleWindow("community")}>Community Monitor</button>
+        <button type="button" className={`taskbtn${visible.community ? " active" : ""}`} id="task-community" onClick={() => toggleWindow("community")}>Reddit Community</button>
         <div id="tray"><span id="clock">{clock}</span></div>
       </div>
 

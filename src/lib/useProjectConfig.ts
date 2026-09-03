@@ -39,16 +39,3 @@ export function useProjectConfig() {
 
   return { config, loading };
 }
-
-// ponytail: DexScreener renders any pair URL as an embed once you add these params
-export function dexEmbedUrl(dexscreenerUrl: string | undefined) {
-  if (!dexscreenerUrl) return null;
-  try {
-    const url = new URL(dexscreenerUrl);
-    if (url.hostname !== "dexscreener.com" && url.hostname !== "www.dexscreener.com") return null;
-    url.search = "embed=1&theme=dark&info=0";
-    return url.href;
-  } catch {
-    return null;
-  }
-}
