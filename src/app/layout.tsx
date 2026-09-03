@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
-const title = "$SNOOFI 98";
-const description = "Snoofi is the Reddit Dog. Launched on PONS, paired with $RDDT — 100% of trading fees paid out to holders.";
+const title = "$SNOOFI";
+const description = "Snoofi is the Reddit Dog. Launched on PONS and paired with $RDDT, actual Reddit stock. All the trading fees get paid out to holders as $RDDT. 100% of them.";
 const banner = { url: "/assets/hero-snoofi.jpg", width: 1600, height: 533, alt: "Snoofi dogs under a SNOOFI stop sign" };
 
 export const metadata: Metadata = {
