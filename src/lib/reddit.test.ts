@@ -240,3 +240,11 @@ test("shapeApifyData maps Apify dataset items into RedditData", async () => {
   assert.deepEqual(data.posts.map((p) => [p.title, p.author, p.score, p.commentCount]), [["hello world", "No_Dig_876", 5, 2]]);
   assert.throws(() => shapeApifyData([{ dataType: "post", id: "x", title: "no community", url: "https://www.reddit.com/r/x/" }], "now"));
 });
+
+test("subredditFromUrl picks the community out of a reddit link", async () => {
+  const { subredditFromUrl } = await import("./reddit");
+  assert.equal(subredditFromUrl("https://www.reddit.com/r/solana/"), "solana");
+  assert.equal(subredditFromUrl("https://reddit.com/r/Snoofi98"), "Snoofi98");
+  assert.equal(subredditFromUrl("https://t.me/snoofi"), null);
+  assert.equal(subredditFromUrl(null), null);
+});

@@ -83,9 +83,11 @@ export default function Desktop({ subreddit }: { subreddit: string }) {
   const ca = config?.contract_address || "";
   const caLabel = ca || "Coming Soon";
   const buyUrl = getBuyUrl(config);
+  // telegram_url doubles as the reddit source when it points at reddit.com (see lib/reddit.ts)
+  const telegramUrl = config?.telegram_url && !/reddit\.com/i.test(config.telegram_url) ? config.telegram_url : null;
   const links = [
     ["X", "Twitter / X", config?.twitter_url],
-    ["TG", "Telegram", config?.telegram_url],
+    ["TG", "Telegram", telegramUrl],
     ["DX", "Chart", config?.dexscreener_url],
     ["PF", "Buy", buyUrl],
   ].filter((row): row is [string, string, string] => Boolean(row[2]));
@@ -398,7 +400,7 @@ void main(){
       openExternal(buyUrl);
       setStatus(`Opening ${config?.buy_platform} ...`);
     } else if (action === "tg") {
-      if (config?.telegram_url) openExternal(config.telegram_url);
+      if (telegramUrl) openExternal(telegramUrl);
     } else if (action === "community") {
       if (!config?.community_url) return setStatus("Community link coming soon.");
       openExternal(config.community_url);

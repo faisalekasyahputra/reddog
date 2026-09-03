@@ -264,6 +264,44 @@ export async function fetchStoredCommunity(): Promise<RedditData> {
   return data.data as RedditData;
 }
 
+// ponytail: the admin panel has no reddit field, so a reddit.com/r/<name> link in telegram_url selects the community.
+export function subredditFromUrl(value: unknown): string | null {
+  const match = typeof value === "string" ? /reddit\.com\/r\/([A-Za-z0-9_]+)/i.exec(value) : null;
+  return match ? match[1] : null;
+}
+
+export async function configuredSubreddit(): Promise<string> {
+  const { data } = await supabaseAdmin()
+    .from("project_configs")
+    .select("telegram_url, melly_projects!inner(slug)")
+    .eq("melly_projects.slug", FEED_KEY)
+    .maybeSingle();
+  return subredditFromUrl(data?.telegram_url) ?? SUBREDDIT;
+}
+
+// Point the Apify task at `name` and start it, so the next webhook stores the right community.
+export async function resyncApifyTask(name: string): Promise<void> {
+  const token = process.env.APIFY_TOKEN;
+  const taskId = process.env.APIFY_TASK_ID;
+  if (!token || !taskId) throw new RedditConfigError("Missing Apify configuration");
+  const headers = { Authorization: `Bearer ${token}`, "Content-Type": "application/json" };
+  const base = `https://api.apify.com/v2/actor-tasks/${encodeURIComponent(taskId)}`;
+  const sub = encodeURIComponent(name);
+  const input = await fetch(`${base}/input`, { headers, signal: AbortSignal.timeout(10_000) }).then((r) => r.json());
+  const updated = await fetch(`${base}/input`, {
+    method: "PUT",
+    headers,
+    body: JSON.stringify({
+      ...input,
+      startUrls: [{ url: `https://www.reddit.com/r/${sub}/` }, { url: `https://www.reddit.com/r/${sub}/hot/` }],
+    }),
+    signal: AbortSignal.timeout(10_000),
+  });
+  if (!updated.ok) throw new RedditUpstreamError();
+  const started = await fetch(`${base}/runs`, { method: "POST", headers, signal: AbortSignal.timeout(10_000) });
+  if (!started.ok) throw new RedditUpstreamError();
+}
+
 export function fetchCommunity(): Promise<RedditData> {
   return process.env.REDDIT_CLIENT_ID ? fetchRedditCommunity() : fetchStoredCommunity();
 }

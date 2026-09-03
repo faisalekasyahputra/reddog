@@ -1,6 +1,6 @@
 import { revalidateTag } from "next/cache";
 
-import { ingestApifyDataset } from "@/lib/reddit";
+import { configuredSubreddit, ingestApifyDataset, resyncApifyTask } from "@/lib/reddit";
 
 export const runtime = "nodejs";
 
@@ -20,6 +20,12 @@ export async function POST(request: Request) {
   try {
     const data = await ingestApifyDataset(datasetId);
     revalidateTag("reddit", "max");
+    // Admin changed the community since this run started: retarget the task and rerun right away.
+    const wanted = await configuredSubreddit();
+    if (wanted.toLowerCase() !== data.community.name.toLowerCase()) {
+      await resyncApifyTask(wanted);
+      return Response.json({ ok: true, posts: data.posts.length, fetchedAt: data.fetchedAt, resyncTo: wanted });
+    }
     return Response.json({ ok: true, posts: data.posts.length, fetchedAt: data.fetchedAt });
   } catch (error) {
     console.error("Reddit ingest failed", { name: error instanceof Error ? error.name : "Error" });
