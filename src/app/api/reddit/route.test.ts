@@ -35,7 +35,7 @@ test("GET serves the manual feed when Reddit is not configured", async () => {
   assert.equal(response.status, 200);
   const body = await response.json();
   assert.equal(body.source, "manual");
-  assert.equal(body.community.name, "snoofi98");
+  assert.equal(body.community.name, "snoofipons");
 });
 
 test("GET never logs raw upstream error content", async () => {

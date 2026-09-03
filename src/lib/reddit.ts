@@ -2,7 +2,7 @@ import "server-only";
 
 import { createClient } from "@supabase/supabase-js";
 
-export const SUBREDDIT = "snoofi98";
+export const SUBREDDIT = "snoofipons";
 const REDDIT_URL = "https://www.reddit.com";
 
 export type RedditCommunity = {

@@ -585,7 +585,7 @@ void main(){
                 <div className="sbox"><h3>Links</h3><div className="inner" id="linkbox">{links.map(([tag, label, url]) => <button type="button" className="linkrow" key={label} onClick={() => openExternal(url)}><img className="linkico" src={`https://icon.horse/icon/${new URL(url).hostname}`} width={16} height={16} alt={tag} /><span>{label}</span></button>)}</div></div>
                 <div className="sbox"><h3>Official Community</h3><div className="inner"><div className="community-copy">the official $SNOOFI community. mascot enjoyers only.</div><div className="stat"><span>members</span><b>growing</b></div><div className="stat"><span>fud</span><b>0</b></div><button type="button" className="bigbtn buy" onClick={() => act("community")}>JOIN COMMUNITY</button></div></div>
                 <div className="sbox"><h3>$SNOOFI</h3><div className="inner">
-                  <div className="stat"><span>supply</span><b>1,000,000,000</b></div><div className="stat"><span>tax</span><b>0 / 0</b></div><div className="stat"><span>LP</span><b>burned</b></div><div className="stat"><span>mint</span><b>revoked</b></div>
+                  <div className="stat"><span>supply</span><b>1,000,000,000</b></div><div className="stat"><span>tax</span><b>1%</b></div><div className="stat"><span>LP</span><b>burned</b></div><div className="stat"><span>mint</span><b>revoked</b></div>
                   <div className="contract-label">contract address</div><div className="ca-field sunken" id="ca-side">{caLabel}</div>
                   <button type="button" className="bigbtn" onClick={() => act("copyca")}>Copy CA</button>{buyUrl && <button type="button" className="bigbtn buy" onClick={() => act("buy")}>BUY $SNOOFI</button>}
                 </div></div>
