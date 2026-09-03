@@ -143,7 +143,6 @@ section{margin-bottom:26px}
 #startmenu .item:active{padding:6px 9px;box-shadow:none}
 #startmenu .item:hover{background:var(--sel);color:#fff}
 #startmenu .divider{height:0;border-top:1px solid var(--shadow);border-bottom:1px solid var(--hilite);margin:2px 0}
-.start-cart{filter:invert(40%) sepia(90%) saturate(3000%) hue-rotate(357deg)}
 .start-ca{font-family:"Courier New",monospace;font-weight:bold}
 .refresh-btn{padding:1px 8px}
 

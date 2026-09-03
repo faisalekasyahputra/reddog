@@ -447,11 +447,6 @@ void main(){
             <line x1="11" y1="19" x2="21" y2="19" stroke="#ff8717" strokeWidth="2" />
             <line x1="11" y1="24" x2="17" y2="24" stroke="#ff8717" strokeWidth="2" />
           </g>
-          <g id="i-cart">
-            <path d="M3 5 h5 l4 15 h13 l4 -11 H10" fill="none" stroke="#fff" strokeWidth="2.5" />
-            <circle cx="13" cy="26" r="2.5" fill="#fff" />
-            <circle cx="24" cy="26" r="2.5" fill="#fff" />
-          </g>
           <g id="i-globe">
             <circle cx="16" cy="16" r="13" fill="none" stroke="#fff" strokeWidth="2.5" />
             <ellipse cx="16" cy="16" rx="6" ry="13" fill="none" stroke="#fff" strokeWidth="2" />
@@ -497,7 +492,7 @@ void main(){
       <div id="desktop" className={bootStage === "done" ? "on" : ""}>
         <div className="dicons">
           {buyUrl && <div className="dicon" tabIndex={0} role="button" onClick={() => act("buy")} onKeyDown={(event) => onActionKey(event, "buy")}>
-            <svg width="32" height="32" viewBox="0 0 32 32"><use href="#i-cart" /></svg><span className="lbl">buy.exe</span>
+            <Image src="/assets/icons/pump.png" width={32} height={32} alt="" /><span className="lbl">buy.exe</span>
           </div>}
           <div className="dicon" tabIndex={0} role="button" onClick={() => act("ca")} onKeyDown={(event) => onActionKey(event, "ca")}>
             <svg width="32" height="32" viewBox="0 0 32 32"><use href="#i-doc" /></svg><span className="lbl">CA.txt</span>
@@ -641,7 +636,7 @@ void main(){
       <div className={`win${startOpen ? " open" : ""}`} id="startmenu">
         <div className="rail">$SNOOFI&nbsp;98</div>
         <div className="items">
-          {buyUrl && <button type="button" className="item" onClick={() => act("buy")}><svg width="18" height="18" viewBox="0 0 32 32" className="start-cart"><use href="#i-cart" /></svg><span>Buy $SNOOFI</span></button>}
+          {buyUrl && <button type="button" className="item" onClick={() => act("buy")}><Image className="start-cart" src="/assets/icons/pump.png" width={18} height={18} alt="" /><span>Buy $SNOOFI</span></button>}
           <button type="button" className="item" onClick={() => act("copyca")}><span className="start-ca">CA</span><span>Copy CA</span></button>
           <button type="button" className="item" onClick={() => act("howto")}><b>?</b><span>How to buy (wizard)</span></button>
           <button type="button" className="item" onClick={() => act("tg")}><b>TG</b><span>Telegram</span></button>
