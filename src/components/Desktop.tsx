@@ -29,6 +29,9 @@ const memes = [
   "Snoofi speeds through a neon tunnel in a sports car",
   "Two Snoofi figures watch an industrial fire",
   "Snoofi perches on a man beneath green laser lights",
+  "Snoofi appears in a cinematic community scene",
+  "Snoofi stars in a dramatic outdoor meme scene",
+  "Snoofi poses in a stylized orange-lit meme scene",
 ].map((alt, index) => ({
   src: `/assets/memes/meme-${String(index + 1).padStart(2, "0")}.avif`,
   alt,
@@ -553,7 +556,7 @@ void main(){
                   <div className="sechead"><h2>VIDEO</h2><div className="rule" /></div>
                   <div className="player">
                     <div className="pbar"><span>snoofi.mp4</span><span>1998 kbps</span></div>
-                    <div className="slot vid sunken"><div className="ph"><div className="big">VIDEO SLOT</div><div>drop assets/video.mp4 — 16:9, Kling output goes here</div></div></div>
+                    <div className="slot vid sunken"><video src="/assets/video/snoofi-hero.mp4" autoPlay muted loop playsInline controls preload="metadata" aria-label="Snoofi hero video" /></div>
                     <div className="controls"><button type="button">&#9658;</button><button type="button">&#10074;&#10074;</button><button type="button">&#9632;</button><div className="track" /><button type="button">Full</button></div>
                   </div>
                 </section>
