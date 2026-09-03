@@ -539,7 +539,7 @@ void main(){
               <div className="content">
                 <section id="sec-top">
                   <div className="slot hero sunken">
-                    <Image src="/assets/hero-snoofi-wave.avif" alt="Snoofi surfing beneath a towering ocean wave" width={1672} height={941} priority sizes="(max-width: 780px) 100vw, 900px" />
+                    <Image src="/assets/hero-snoofi.jpg" alt="Snoofi dogs under a SNOOFI stop sign, one holding a phone showing the Robinhood logo" width={1600} height={533} priority sizes="(max-width: 780px) 100vw, 900px" />
                   </div>
                 </section>
 
@@ -644,10 +644,10 @@ void main(){
       <div className={`win${startOpen ? " open" : ""}`} id="startmenu">
         <div className="rail">$SNOOFI&nbsp;98</div>
         <div className="items">
-          {buyUrl && <button type="button" className="item" onClick={() => act("buy")}><Image className="start-cart" src="/assets/icons/pons.png" width={18} height={18} alt="" /><span>Buy $SNOOFI</span></button>}
+          {buyUrl && <button type="button" className="item" onClick={() => act("buy")}><Image className="start-ico" src="/assets/icons/pons.png" width={22} height={22} alt="" /><span>Buy $SNOOFI</span></button>}
           <button type="button" className="item" onClick={() => act("copyca")}><span className="start-ca">CA</span><span>Copy CA</span></button>
           <button type="button" className="item" onClick={() => act("howto")}><b>?</b><span>How to buy (wizard)</span></button>
-          <button type="button" className="item" onClick={() => act("tg")}><b>TG</b><span>Telegram</span></button>
+          {telegramUrl && <button type="button" className="item" onClick={() => act("tg")}><b>TG</b><span>Telegram</span></button>}
           <div className="divider" />
           <button type="button" className="item" onClick={() => act("reboot")}><b>&#8635;</b><span>Shut Down... (reboot)</span></button>
         </div>

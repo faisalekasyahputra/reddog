@@ -143,6 +143,8 @@ section{margin-bottom:26px}
 #startmenu .item:active{padding:6px 9px;box-shadow:none}
 #startmenu .item:hover{background:var(--sel);color:#fff}
 #startmenu .divider{height:0;border-top:1px solid var(--shadow);border-bottom:1px solid var(--hilite);margin:2px 0}
+#startmenu .item>:first-child{flex:0 0 22px;display:flex;align-items:center;justify-content:center}
+#startmenu .item .start-ico{object-fit:contain;margin:-4px 0}
 .start-ca{font-family:"Courier New",monospace;font-weight:bold}
 .refresh-btn{padding:1px 8px}
 
