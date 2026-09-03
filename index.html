@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>$SNOOFI - THE OFFICIAL REDDIT MASCOT</title>
+<link rel="icon" type="image/png" href="assets/character/snoofi-head-transparent.png">
+<style>
+  /* ============ WIN98 IN ORANGE/WHITE ============ */
+  :root{
+    --face:#fff3ea;
+    --face-light:#ffffff;
+    --shadow:#f0c3a4;
+    --dark:#b34700;
+    --hilite:#ffffff;
+    --title-a:#ff4500;
+    --title-b:#ff8717;
+    --desktop-a:#ff5510;
+    --desktop-b:#ff9430;
+    --field:#ffffff;
+    --link:#d63a00;
+    --sel:#ff4500;
+    --ink:#3d2317;
+    --muted:#b06a45;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;overflow:hidden;}
+  body{
+    background:linear-gradient(160deg,var(--desktop-a),var(--desktop-b));
+    font-family:Tahoma,"MS Sans Serif",Geneva,sans-serif;
+    font-size:11px;color:var(--ink);
+    -webkit-font-smoothing:none;
+  }
+  .booting, .booting *{cursor:wait !important;}
+
+  button{
+    font-family:inherit;font-size:11px;color:var(--ink);
+    background:var(--face);border:none;cursor:pointer;
+    box-shadow:inset -1px -1px 0 var(--dark), inset 1px 1px 0 var(--face-light),
+               inset -2px -2px 0 var(--shadow), inset 2px 2px 0 var(--hilite);
+    padding:3px 12px;
+  }
+  button:active{
+    box-shadow:inset 1px 1px 0 var(--dark), inset -1px -1px 0 var(--face-light),
+               inset 2px 2px 0 var(--shadow), inset -2px -2px 0 var(--hilite);
+    padding:4px 11px 2px 13px;
+  }
+  button:focus-visible{outline:1px dotted var(--dark);outline-offset:-5px;}
+  a{color:var(--link);}
+
+  .sunken{
+    background:var(--field);
+    box-shadow:inset -1px -1px 0 var(--hilite), inset 1px 1px 0 var(--shadow),
+               inset -2px -2px 0 var(--face-light), inset 2px 2px 0 var(--dark);
+  }
+
+  /* ============ LOADER ============ */
+  #bios{
+    position:fixed;inset:0;z-index:1000;
+    background:#fffdfb;color:#ff5a00;
+    font-family:"Courier New",monospace;font-size:14px;line-height:1.55;
+    padding:26px;white-space:pre-wrap;
+  }
+  #bios .ok{color:#1a9e3c;font-weight:bold;}
+  #bios .dim{color:#c98d6b;}
+  #splash{
+    position:fixed;inset:0;z-index:999;background:#ffffff;
+    display:none;align-items:center;justify-content:center;flex-direction:column;gap:48px;
+  }
+  #splash .ticker{
+    font-size:78px;font-weight:bold;font-style:italic;letter-spacing:-4px;
+    color:#ff4500;line-height:1;text-align:center;
+  }
+  #splash .sub{color:var(--muted);font-size:16px;margin-top:10px;text-align:center;}
+  .brand-logo{display:block;object-fit:contain;}
+  .splash-logo{width:110px;height:96px;margin:0 auto 18px;}
+  .header-logo{width:26px;height:24px;}
+  .bootbar{
+    width:300px;height:18px;border:2px solid #ffb98a;border-radius:9px;
+    overflow:hidden;position:relative;background:#fff2e8;
+  }
+  .bootbar .segs{
+    position:absolute;top:2px;bottom:2px;left:0;width:66px;
+    background:repeating-linear-gradient(90deg,#ff4500 0 8px,#ff8717 8px 16px,#ffb347 16px 24px);
+    animation:cycle 1s linear infinite;
+  }
+  @keyframes cycle{from{transform:translateX(-70px);}to{transform:translateX(310px);}}
+  #bootstatus{color:#c07040;font-size:12px;min-height:16px;text-align:center;margin-top:-30px;}
+  @media (prefers-reduced-motion:reduce){.bootbar .segs{animation-duration:2.4s;}}
+  #boot-skip{
+    position:fixed;bottom:14px;right:14px;z-index:1001;
+    background:none;box-shadow:none;border:none;
+    color:#d89b74;font-family:"Courier New",monospace;font-size:12px;padding:4px 8px;
+  }
+  #boot-skip:active{padding:4px 8px;box-shadow:none;}
+
+  /* ============ DESKTOP ============ */
+  #desktop{position:fixed;inset:0 0 30px 0;opacity:0;transition:opacity .5s;overflow:hidden;}
+  #desktop.on{opacity:1;}
+  .dicons{position:absolute;top:14px;left:14px;display:flex;flex-direction:column;gap:18px;}
+  .dicon{width:82px;text-align:center;color:#fff;cursor:pointer;user-select:none;
+    text-shadow:1px 1px 0 rgba(120,30,0,.7);}
+  .dicon svg{display:block;margin:0 auto;filter:drop-shadow(1px 1px 0 rgba(120,30,0,.4));}
+  .dicon span.lbl{display:inline-block;padding:1px 3px;margin-top:4px;}
+  .dicon:focus-visible span.lbl{background:rgba(255,255,255,.25);outline:1px dotted #fff;}
+
+  /* ============ WINDOW CHROME ============ */
+  .win{
+    position:absolute;display:flex;flex-direction:column;
+    background:var(--face);padding:3px;min-width:280px;
+    box-shadow:inset -1px -1px 0 var(--dark), inset 1px 1px 0 var(--face-light),
+               inset -2px -2px 0 var(--shadow), inset 2px 2px 0 var(--hilite),
+               3px 3px 0 rgba(120,30,0,.18);
+  }
+  .titlebar{
+    display:flex;align-items:center;gap:6px;
+    background:linear-gradient(90deg,var(--title-a),var(--title-b));
+    color:#fff;font-weight:bold;padding:2px 4px;cursor:default;user-select:none;
+  }
+  .titlebar .ttext{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+  .tbtn{width:16px;height:14px;padding:0;font-size:9px;line-height:1;
+    display:inline-flex;align-items:center;justify-content:center;}
+  .tbtn:active{padding:0;}
+  .menubar{display:flex;gap:2px;padding:2px 2px 3px;}
+  .menubar span{padding:1px 6px;cursor:default;}
+  .menubar span:hover{background:var(--sel);color:#fff;}
+  .menubar span u{text-decoration:underline;}
+  .addrbar{display:flex;align-items:center;gap:6px;padding:2px 4px 4px;}
+  .addrbar .field{flex:1;padding:2px 5px;white-space:nowrap;overflow:hidden;}
+  .winbody{flex:1;overflow:auto;background:var(--field);margin-top:2px;scroll-behavior:smooth;
+    box-shadow:inset -1px -1px 0 var(--hilite), inset 1px 1px 0 var(--shadow),
+               inset -2px -2px 0 var(--face-light), inset 2px 2px 0 var(--dark);}
+  .statusbar{display:flex;gap:3px;margin-top:3px;}
+  .statusbar .pane{flex:1;padding:2px 6px;white-space:nowrap;overflow:hidden;
+    box-shadow:inset -1px -1px 0 var(--hilite), inset 1px 1px 0 var(--shadow);}
+  .statusbar .pane.sm{flex:0 0 auto;}
+
+  /* ============ SITE LAYOUT ============ */
+  #browser{top:16px;left:106px;width:min(1240px,calc(100vw - 500px));height:calc(100vh - 76px);}
+  #community{top:16px;right:16px;width:360px;height:calc(100vh - 76px);}
+  #community .winbody{background:var(--field);}
+  .cstats{display:flex;gap:14px;background:#fff8f3;border-bottom:1px solid #ffd9bd;padding:5px 10px;}
+  .cstats .stat{display:flex;gap:5px;}
+  .cstats .stat b{color:#ff4500;}
+  .crow{display:flex;gap:8px;padding:7px 9px;cursor:pointer;border-bottom:1px solid #ffeede;}
+  .crow:hover{background:var(--sel);}
+  .crow:hover .ctitle,.crow:hover .cmeta,.crow:hover .cscore{color:#fff;}
+  .cscore{flex:0 0 40px;text-align:center;font-weight:bold;color:#ff4500;padding-top:1px;}
+  .cbody{flex:1;min-width:0;}
+  .ctitle{font-size:12px;color:var(--ink);line-height:1.4;}
+  .cmeta{color:var(--muted);margin-top:2px;}
+  .chead2{
+    background:#fff;border-bottom:2px solid #ff4500;padding:6px 10px;
+    display:flex;align-items:center;justify-content:space-between;gap:8px;
+  }
+  .chead2 .cname{font-weight:bold;font-size:14px;color:#ff4500;}
+  .r-head{
+    position:sticky;top:0;z-index:5;
+    background:#fff;border-bottom:2px solid #ff4500;
+    padding:7px 12px;display:flex;align-items:center;gap:14px;
+  }
+  .r-logo{font-size:20px;font-weight:bold;letter-spacing:-1px;color:#ff4500;
+    display:flex;align-items:center;gap:7px;cursor:pointer;}
+  .r-nav{display:flex;gap:2px;margin-left:auto;}
+  .r-nav button{font-weight:bold;padding:3px 12px;}
+  .r-nav button.buy{background:linear-gradient(180deg,#ff8717,#ff4500);color:#fff;
+    text-shadow:1px 1px 0 rgba(120,30,0,.5);}
+
+  .page{display:flex;align-items:flex-start;}
+  .content{flex:1;min-width:0;padding:14px 14px 60px;}
+  .r-side{flex:0 0 218px;padding:14px 12px 60px 0;display:flex;flex-direction:column;gap:12px;
+    position:sticky;top:46px;}
+
+  section{margin-bottom:26px;}
+  .sechead{
+    display:flex;align-items:center;gap:8px;margin-bottom:8px;
+  }
+  .sechead h2{
+    font-size:13px;color:#fff;font-weight:bold;
+    background:linear-gradient(90deg,var(--title-a),var(--title-b));
+    padding:3px 10px;
+  }
+  .sechead .rule{flex:1;height:0;border-top:1px solid var(--shadow);border-bottom:1px solid var(--hilite);}
+
+  /* placeholder slots (image / video) */
+  .slot{position:relative;padding:4px;}
+  .slot img, .slot video{display:block;width:100%;height:100%;object-fit:cover;}
+  .slot .ph{
+    position:absolute;inset:4px;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:8px;
+    background:
+      repeating-linear-gradient(45deg,#fff6ee 0 14px,#ffeddd 14px 28px);
+    border:1px dashed #ffb98a;color:var(--muted);text-align:center;
+  }
+  .slot .ph .big{font-size:15px;font-weight:bold;color:#e05a2b;letter-spacing:1px;}
+  .slot.hero{height:300px;}
+  .slot.vid{aspect-ratio:16/9;}
+
+  /* lore */
+  .lore p{font-size:12px;line-height:1.7;max-width:64ch;margin-bottom:10px;}
+  .lore .dropcap::first-letter{
+    font-size:34px;font-weight:bold;color:#ff4500;float:left;
+    line-height:.85;padding-right:6px;font-style:italic;
+  }
+  .lore .sig{color:var(--muted);font-style:italic;}
+
+  /* meme scroller */
+  .scroller-wrap{display:flex;align-items:stretch;gap:4px;}
+  .scrollbtn{flex:0 0 26px;font-weight:bold;font-size:13px;}
+  .scroller{flex:1;overflow:hidden;padding:10px 0;}
+  .mtrack{display:flex;gap:10px;width:max-content;will-change:transform;}
+  .meme{
+    flex:0 0 240px;background:var(--face);padding:6px;
+    box-shadow:inset -1px -1px 0 var(--dark), inset 1px 1px 0 var(--face-light),
+               inset -2px -2px 0 var(--shadow), inset 2px 2px 0 var(--hilite);
+  }
+  .meme .mimg{position:relative;height:180px;}
+  .meme .mimg img{display:block;width:100%;height:100%;object-fit:cover;}
+  .meme .mimg .ph{
+    position:absolute;inset:0;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:4px;
+    background:repeating-linear-gradient(45deg,#fff6ee 0 12px,#ffeddd 12px 24px);
+    border:1px dashed #ffb98a;color:var(--muted);
+  }
+  .meme .mimg .ph .num{font-size:16px;font-weight:bold;color:#e05a2b;}
+  #bg{position:fixed;inset:0;width:100%;height:100%;z-index:-1;display:block;}
+
+  /* video player chrome */
+  .player{background:var(--face);padding:4px;
+    box-shadow:inset -1px -1px 0 var(--dark), inset 1px 1px 0 var(--face-light),
+               inset -2px -2px 0 var(--shadow), inset 2px 2px 0 var(--hilite);}
+  .player .pbar{
+    background:linear-gradient(90deg,var(--title-a),var(--title-b));
+    color:#fff;font-weight:bold;padding:2px 6px;margin-bottom:4px;
+    display:flex;justify-content:space-between;
+  }
+  .player .controls{display:flex;gap:3px;margin-top:4px;align-items:center;}
+  .player .controls .track{flex:1;height:10px;margin:0 6px;
+    box-shadow:inset -1px -1px 0 var(--hilite), inset 1px 1px 0 var(--shadow);
+    background:var(--field);}
+
+  /* sidebar boxes */
+  .sbox{background:var(--face);padding:4px;
+    box-shadow:inset -1px -1px 0 var(--dark), inset 1px 1px 0 var(--face-light),
+               inset -2px -2px 0 var(--shadow), inset 2px 2px 0 var(--hilite);}
+  .sbox h3{background:linear-gradient(90deg,var(--title-a),var(--title-b));
+    color:#fff;font-size:11px;padding:2px 6px;margin-bottom:5px;font-weight:bold;}
+  .sbox .inner{padding:2px 5px 5px;}
+  .sbox .stat{display:flex;justify-content:space-between;padding:2px 0;}
+  .sbox .stat b{color:#ff4500;}
+  .ca-field{
+    padding:3px 5px;margin:5px 0;font-family:"Courier New",monospace;font-size:10px;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  }
+  .bigbtn{width:100%;font-weight:bold;padding:6px 0;margin-top:4px;}
+  .bigbtn.buy{background:linear-gradient(180deg,#ff8717,#ff4500);color:#fff;
+    text-shadow:1px 1px 0 rgba(120,30,0,.5);font-size:13px;}
+  .linkrow{display:flex;align-items:center;gap:7px;padding:4px 3px;cursor:pointer;color:var(--link);}
+  .linkrow:hover{background:var(--sel);color:#fff;}
+  .linkrow:hover svg *{stroke:#fff;fill:#fff;}
+  .chartwrap{background:#fff;padding:2px;}
+
+  /* dialogs */
+  .dlg{width:min(440px,calc(100vw - 36px));z-index:60;}
+  .dlg .content2{padding:12px;background:var(--face);line-height:1.6;}
+  .dlg .btnrow{display:flex;justify-content:flex-end;gap:6px;padding:0 12px 10px;background:var(--face);}
+  .dlg .btnrow button{min-width:72px;}
+  .stepline{display:flex;gap:8px;margin:5px 0;}
+  .stepline .n{flex:0 0 auto;width:18px;height:18px;background:#ff4500;color:#fff;
+    display:flex;align-items:center;justify-content:center;font-weight:bold;}
+
+  /* taskbar / start */
+  #taskbar{
+    position:fixed;left:0;right:0;bottom:0;height:30px;z-index:500;
+    background:var(--face);display:flex;align-items:center;gap:4px;padding:2px 4px;
+    box-shadow:inset 0 1px 0 var(--hilite), 0 -1px 0 var(--dark);
+  }
+  #startbtn{font-weight:bold;display:flex;align-items:center;gap:6px;padding:2px 9px;}
+  .taskbtn{max-width:190px;flex:0 1 auto;overflow:hidden;text-overflow:ellipsis;
+    white-space:nowrap;text-align:left;padding:2px 8px;}
+  .taskbtn.active{font-weight:bold;
+    box-shadow:inset 1px 1px 0 var(--dark), inset -1px -1px 0 var(--face-light),
+               inset 2px 2px 0 var(--shadow), inset -2px -2px 0 var(--hilite);
+    background:repeating-conic-gradient(#fff 0 25%, var(--face) 0 50%) 0 0/4px 4px;}
+  #tray{margin-left:auto;display:flex;align-items:center;gap:7px;padding:2px 9px;
+    box-shadow:inset -1px -1px 0 var(--hilite), inset 1px 1px 0 var(--shadow);}
+  #startmenu{position:fixed;left:2px;bottom:32px;z-index:600;width:210px;display:none;padding:3px;}
+  #startmenu.open{display:flex;}
+  #startmenu .rail{
+    background:linear-gradient(180deg,var(--title-b),var(--title-a));color:#fff;width:26px;
+    display:flex;align-items:flex-end;justify-content:center;padding:8px 0;
+    font-weight:bold;letter-spacing:1px;writing-mode:vertical-rl;transform:rotate(180deg);font-size:14px;}
+  #startmenu .items{flex:1;display:flex;flex-direction:column;}
+  #startmenu .item{display:flex;align-items:center;gap:9px;padding:6px 9px;cursor:pointer;}
+  #startmenu .item:hover{background:var(--sel);color:#fff;}
+  #startmenu .item:hover svg *{stroke:#fff;fill:#fff;}
+  #startmenu .divider{height:0;border-top:1px solid var(--shadow);border-bottom:1px solid var(--hilite);margin:2px 0;}
+
+  @media (max-width:1150px){
+    #community{display:none !important;}
+    #browser{width:min(1240px,calc(100vw - 118px));}
+  }
+  @media (max-width:780px){
+    .r-side{display:none;}
+    #browser{left:6px;width:calc(100vw - 12px);}
+    .dicons{flex-direction:row;top:auto;bottom:40px;gap:8px;}
+    .slot.hero{height:200px;}
+  }
+</style>
+</head>
+<body class="booting">
+
+<canvas id="bg" aria-hidden="true"></canvas>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <g id="i-snoo">
+      <line x1="55" y1="22" x2="72" y2="6" stroke="#ff4500" stroke-width="5"/>
+      <circle cx="74" cy="5" r="6" fill="#ff4500"/>
+      <ellipse cx="55" cy="58" rx="34" ry="30" fill="#ff4500"/>
+      <circle cx="16" cy="56" r="9" fill="#ff4500"/>
+      <circle cx="94" cy="56" r="9" fill="#ff4500"/>
+      <circle cx="43" cy="52" r="6" fill="#fff"/>
+      <circle cx="67" cy="52" r="6" fill="#fff"/>
+      <path d="M40 70 Q55 80 70 70" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round"/>
+    </g>
+    <g id="i-doc">
+      <path d="M7 2 h12 l6 6 v22 H7 z" fill="#fff" stroke="#b34700" stroke-width="2"/>
+      <path d="M19 2 v6 h6" fill="none" stroke="#b34700" stroke-width="2"/>
+      <line x1="11" y1="14" x2="21" y2="14" stroke="#ff8717" stroke-width="2"/>
+      <line x1="11" y1="19" x2="21" y2="19" stroke="#ff8717" stroke-width="2"/>
+      <line x1="11" y1="24" x2="17" y2="24" stroke="#ff8717" stroke-width="2"/>
+    </g>
+    <g id="i-cart">
+      <path d="M3 5 h5 l4 15 h13 l4 -11 H10" fill="none" stroke="#fff" stroke-width="2.5"/>
+      <circle cx="13" cy="26" r="2.5" fill="#fff"/>
+      <circle cx="24" cy="26" r="2.5" fill="#fff"/>
+    </g>
+    <g id="i-globe">
+      <circle cx="16" cy="16" r="13" fill="none" stroke="#fff" stroke-width="2.5"/>
+      <ellipse cx="16" cy="16" rx="6" ry="13" fill="none" stroke="#fff" stroke-width="2"/>
+      <line x1="3" y1="16" x2="29" y2="16" stroke="#fff" stroke-width="2"/>
+    </g>
+    <g id="i-bin">
+      <path d="M8 9 h16 l-2 20 H10 z" fill="none" stroke="#fff" stroke-width="2.5"/>
+      <line x1="5" y1="9" x2="27" y2="9" stroke="#fff" stroke-width="2.5"/>
+      <line x1="13" y1="9" x2="13" y2="5" stroke="#fff" stroke-width="2.5"/>
+      <line x1="19" y1="9" x2="19" y2="5" stroke="#fff" stroke-width="2.5"/>
+      <line x1="13" y1="14" x2="14" y2="25" stroke="#fff" stroke-width="2"/>
+      <line x1="19" y1="14" x2="18" y2="25" stroke="#fff" stroke-width="2"/>
+    </g>
+  </defs>
+</svg>
+
+<!-- ============ LOADER: STAGE 1 — POST ============ -->
+<div id="bios" aria-live="polite"></div>
+<button id="boot-skip">ESC to skip &gt;&gt;</button>
+
+<!-- ============ LOADER: STAGE 2 — SPLASH ============ -->
+<div id="splash">
+  <div>
+    <img class="brand-logo splash-logo" src="assets/character/snoofi-head-transparent.png" alt="">
+    <div class="ticker">$SNOOFI</div>
+    <div class="sub">the front page of the trenches</div>
+  </div>
+  <div class="bootbar"><div class="segs"></div></div>
+  <div id="bootstatus">warming up the upvotes...</div>
+</div>
+
+<!-- ============ DESKTOP ============ -->
+<div id="desktop">
+  <div class="dicons">
+    <div class="dicon" tabindex="0" data-act="buy">
+      <svg width="32" height="32" viewBox="0 0 32 32"><use href="#i-cart"/></svg>
+      <span class="lbl">buy.exe</span>
+    </div>
+    <div class="dicon" tabindex="0" data-act="ca">
+      <svg width="32" height="32" viewBox="0 0 32 32"><use href="#i-doc"/></svg>
+      <span class="lbl">CA.txt</span>
+    </div>
+    <div class="dicon" tabindex="0" data-act="browser">
+      <svg width="32" height="32" viewBox="0 0 32 32"><use href="#i-globe"/></svg>
+      <span class="lbl">snoofi.exe</span>
+    </div>
+    <div class="dicon" tabindex="0" data-act="recycle">
+      <svg width="32" height="32" viewBox="0 0 32 32"><use href="#i-bin"/></svg>
+      <span class="lbl">Recycle Bin (fud)</span>
+    </div>
+  </div>
+
+  <div class="win" id="browser">
+    <div class="titlebar" data-drag>
+      <svg width="16" height="14" viewBox="0 0 110 96"><use href="#i-snoo"/></svg>
+      <span class="ttext">$SNOOFI - THE OFFICIAL REDDIT MASCOT</span>
+      <button class="tbtn" aria-label="Minimize">_</button>
+      <button class="tbtn" data-close aria-label="Close">X</button>
+    </div>
+    <div class="menubar">
+      <span><u>F</u>ile</span><span><u>E</u>dit</span><span><u>V</u>iew</span>
+      <span><u>A</u>pe</span><span><u>H</u>odl</span>
+    </div>
+    <div class="addrbar">
+      <span>Address</span>
+      <div class="field sunken" id="addr">http://www.snoofi.wtf/</div>
+      <button style="font-weight:bold;">Go</button>
+    </div>
+    <div class="winbody" id="winbody">
+      <div class="r-head">
+        <div class="r-logo" data-goto="top">
+          <img class="brand-logo header-logo" src="assets/character/snoofi-head-transparent.png" alt="">
+          $SNOOFI
+        </div>
+        <div class="r-nav">
+          <button data-goto="lore">LORE</button>
+          <button data-goto="video">VIDEO</button>
+          <button data-goto="memes">MEMES</button>
+          <button class="buy" data-act="buy">BUY</button>
+        </div>
+      </div>
+
+      <div class="page">
+        <div class="content">
+
+          <!-- HERO -->
+          <section id="sec-top">
+            <div class="slot hero sunken">
+              <img src="assets/hero.png" alt="$SNOOFI hero" onerror="this.remove()">
+              <div class="ph">
+                <svg width="70" height="61" viewBox="0 0 110 96" opacity="0.5"><use href="#i-snoo"/></svg>
+                <div class="big">HERO IMAGE</div>
+                <div>drop assets/hero.png — wide format, ~1600 x 900</div>
+              </div>
+            </div>
+          </section>
+
+          <!-- LORE -->
+          <section id="sec-lore" class="lore">
+            <div class="sechead"><h2>LORE</h2><div class="rule"></div></div>
+            <p class="dropcap">Snoo has worked the front page since 2005. Twenty-one years greeting every lurker at the door — through the blackouts, the API wars, the IPO roadshow — always smiling, always the same blank white face. Total compensation to date: zero dollars, zero shares, one antenna.</p>
+            <p>Then the bell rang on Wall Street and the mascot checked the cap table. Founders: on it. Funds: on it. The face of the entire website: on a sticker sheet in the merch store, marked down 30%.</p>
+            <p>So the mascot went DeFi. $SNOOFI is Snoo's self-issued severance — the mascot of the front page, unofficially on-chain, where no admin can delete it and no board can dilute it. The antenna finally picks up something useful: liquidity. LP burned. Mint revoked. Smile permanent.</p>
+            <p class="sig">the mascot is free. the mascot is financial.</p>
+          </section>
+
+          <!-- VIDEO -->
+          <section id="sec-video">
+            <div class="sechead"><h2>VIDEO</h2><div class="rule"></div></div>
+            <div class="player">
+              <div class="pbar"><span>snoofi.mp4</span><span>1998 kbps</span></div>
+              <div class="slot vid sunken">
+                <video id="thevideo" src="assets/video.mp4" controls preload="metadata"></video>
+                <div class="ph" id="vidph">
+                  <div class="big">VIDEO SLOT</div>
+                  <div>drop assets/video.mp4 — 16:9, Kling output goes here</div>
+                </div>
+              </div>
+              <div class="controls">
+                <button>&#9658;</button><button>&#10074;&#10074;</button><button>&#9632;</button>
+                <div class="track"></div>
+                <button>Full</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- MEMES -->
+          <section id="sec-memes">
+            <div class="sechead"><h2>MEMES</h2><div class="rule"></div></div>
+            <div class="scroller-wrap">
+              <button class="scrollbtn" data-scroll="-1" aria-label="scroll left">&lt;</button>
+              <div class="scroller" id="memescroll"></div>
+              <button class="scrollbtn" data-scroll="1" aria-label="scroll right">&gt;</button>
+            </div>
+          </section>
+
+        </div>
+
+        <!-- SIDEBAR -->
+        <div class="r-side">
+          <div class="sbox">
+            <h3>$SNOOFI</h3>
+            <div class="inner">
+              <div class="stat"><span>supply</span><b>1,000,000,000</b></div>
+              <div class="stat"><span>tax</span><b>0 / 0</b></div>
+              <div class="stat"><span>LP</span><b>burned</b></div>
+              <div class="stat"><span>mint</span><b>revoked</b></div>
+              <div style="margin-top:6px;color:var(--muted);">contract address</div>
+              <div class="ca-field sunken" id="ca-side"></div>
+              <button class="bigbtn" data-act="copyca">Copy CA</button>
+              <button class="bigbtn buy" data-act="buy">BUY $SNOOFI</button>
+            </div>
+          </div>
+          <div class="sbox">
+            <h3>Official Community</h3>
+            <div class="inner">
+              <div style="line-height:1.6;margin-bottom:4px;">the official $SNOOFI community. mascot enjoyers only.</div>
+              <div class="stat"><span>members</span><b>growing</b></div>
+              <div class="stat"><span>fud</span><b>0</b></div>
+              <button class="bigbtn buy" data-act="community">JOIN COMMUNITY</button>
+            </div>
+          </div>
+          <div class="sbox">
+            <h3>Links</h3>
+            <div class="inner" id="linkbox"></div>
+          </div>
+          <div class="sbox">
+            <h3>Chart (trust me)</h3>
+            <div class="inner">
+              <div class="chartwrap sunken">
+                <svg id="chart" width="100%" height="80" viewBox="0 0 180 80" preserveAspectRatio="none"></svg>
+              </div>
+              <div style="text-align:center;color:#1a9e3c;font-weight:bold;margin-top:4px;">up only (financial advice)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="statusbar">
+      <div class="pane" id="statusmsg">Done</div>
+      <div class="pane sm">upvote zone</div>
+    </div>
+  </div>
+
+  <!-- COMMUNITY WINDOW (reddit api) -->
+  <div class="win" id="community">
+    <div class="titlebar" data-drag>
+      <svg width="16" height="14" viewBox="0 0 110 96"><use href="#i-snoo"/></svg>
+      <span class="ttext" id="ctitlebar">OFFICIAL COMMUNITY — Community Monitor</span>
+      <button class="tbtn" data-close aria-label="Close">X</button>
+    </div>
+    <div class="menubar">
+      <span><u>F</u>ile</span><span><u>V</u>iew</span><span data-act="crefresh" style="cursor:pointer;"><u>R</u>efresh</span>
+    </div>
+    <div class="winbody">
+      <div class="chead2">
+        <span class="cname" id="csub">r/...</span>
+        <button data-act="copensub" style="font-weight:bold;">Open on reddit</button>
+      </div>
+      <div class="cstats" id="cstats">
+        <div class="stat"><span>members</span><b>...</b></div>
+        <div class="stat"><span>online</span><b>...</b></div>
+      </div>
+      <div id="cfeed"></div>
+    </div>
+    <div class="statusbar">
+      <div class="pane" id="cstatus">Connecting ...</div>
+      <div class="pane sm"><button data-act="crefresh" style="padding:1px 8px;">Refresh</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ TASKBAR ============ -->
+<div id="taskbar">
+  <button id="startbtn">
+    <svg width="16" height="14" viewBox="0 0 110 96"><use href="#i-snoo"/></svg>Start
+  </button>
+  <button class="taskbtn active" id="task-browser">$SNOOFI — Internet Explorer</button>
+  <button class="taskbtn active" id="task-community">Community Monitor</button>
+  <div id="tray"><span id="clock">--:--</span></div>
+</div>
+
+<div class="win" id="startmenu">
+  <div class="rail">$SNOOFI&nbsp;98</div>
+  <div class="items">
+    <div class="item" data-act="buy"><svg width="18" height="18" viewBox="0 0 32 32" style="filter:invert(40%) sepia(90%) saturate(3000%) hue-rotate(357deg)"><use href="#i-cart"/></svg><span>Buy $SNOOFI</span></div>
+    <div class="item" data-act="copyca"><span style="font-family:'Courier New';font-weight:bold;">CA</span><span>Copy CA</span></div>
+    <div class="item" data-act="howto"><span style="font-weight:bold;">?</span><span>How to buy (wizard)</span></div>
+    <div class="item" data-act="tg"><span style="font-weight:bold;">TG</span><span>Telegram</span></div>
+    <div class="divider"></div>
+    <div class="item" data-act="reboot"><span style="font-weight:bold;">&#8635;</span><span>Shut Down... (reboot)</span></div>
+  </div>
+</div>
+
+<script>
+/* ================= CONFIG — swap before launch ================= */
+const CFG = {
+  ticker: "$SNOOFI",
+  subreddit: "solana",  // swap to the official $SNOOFI community sub when it exists
+  ca: "SNoo98xXxPLACEHOLDERxXxPASTExREALxCAxHEREpump",
+  links: {
+    buy: "https://pump.fun/",
+    x:   "https://x.com/",
+    tg:  "https://t.me/",
+    community: "https://t.me/",
+    dex: "https://dexscreener.com/"
+  }
+};
+
+/* ================= MEMES ================= 
+   file: assets/meme-N.png — shows placeholder until the file exists.
+   prompt: the Nano Banana prompt for generating the real image. */
+const MEMES = [
+  { cap:"WE ARE SO BACK",
+    prompt:"the reddit alien in a tiny suit ringing the NYSE opening bell, confetti, 90s photo grain" },
+  { cap:"SIR, A SECOND WHALE HAS BOUGHT THE CHART",
+    prompt:"two enormous whales breaching out of a green candlestick-chart ocean, tiny alien on a boat saluting" },
+  { cap:"MODS ASLEEP. UPVOTE $SNOOFI",
+    prompt:"a moderator asleep at a CRT desk at 3am while the alien tiptoes past carrying a giant orange upvote arrow" },
+  { cap:"DAY 1 OF HOLDING: STILL HOLDING",
+    prompt:"the alien on a folding chair staring at a blank wall, deadpan, single bare lightbulb, liminal space" },
+  { cap:"FRONT PAGE OR ZERO",
+    prompt:"before/after split: grey trader in the rain vs the same trader golden, ascending a staircase of upvote arrows" },
+  { cap:"DOWNVOTED THE FUD. WE MOVE.",
+    prompt:"the alien walking away from an explosion labeled FUD, sunglasses, not looking back, action poster style" },
+  { cap:"TAKE MY UPVOTE. AND MY LIQUIDITY.",
+    prompt:"medieval knights kneeling, offering giant orange upvote arrows like swords to the alien on a throne" }
+];
+
+/* ================= LOADER ================= */
+const biosEl = document.getElementById("bios");
+const splash = document.getElementById("splash");
+const desktop = document.getElementById("desktop");
+const skipBtn = document.getElementById("boot-skip");
+const bootstatus = document.getElementById("bootstatus");
+let bootDone = false;
+
+const biosLines = [
+  ["SNOOFI BIOS (C) 1998-2026, Trench Software Inc.", 60],
+  ["CPU : Pentium ORANGE @ 98 MHz", 140],
+  ["Memory Test : ", 100, "memcount"],
+  ["", 80],
+  ["Detecting liquidity pool ....... [ <span class='ok'>OK</span> ]", 200],
+  ["Burning LP ..................... [ <span class='ok'>OK</span> ]", 220],
+  ["Revoking mint .................. [ <span class='ok'>OK</span> ]", 220],
+  ["Loading MEMES.SYS .............. [ <span class='ok'>OK</span> ]", 240],
+  ["Scanning for jeets ............. <span class='dim'>none found</span>", 260],
+  ["", 100],
+  ["Starting $SNOOFI 98 ...", 380]
+];
+function runBios(){
+  let i = 0;
+  function next(){
+    if(bootDone) return;
+    if(i >= biosLines.length){ showSplash(); return; }
+    const [text, delay, special] = biosLines[i++];
+    const line = document.createElement("div");
+    biosEl.appendChild(line);
+    if(special === "memcount"){
+      let kb = 0;
+      const iv = setInterval(()=>{
+        if(bootDone){ clearInterval(iv); return; }
+        kb += 16384;
+        if(kb >= 65536){
+          clearInterval(iv);
+          line.innerHTML = "Memory Test : 65536K <span class='ok'>OK</span>";
+          setTimeout(next, delay);
+        } else line.textContent = "Memory Test : " + kb + "K";
+      }, 70);
+    } else {
+      line.innerHTML = text || "&nbsp;";
+      setTimeout(next, delay);
+    }
+  }
+  next();
+}
+const statusLines = [
+  "warming up the upvotes...",
+  "connecting to www.snoofi.wtf (56k)...",
+  "locating whales...",
+  "loading front page..."
+];
+function showSplash(){
+  if(bootDone) return;
+  biosEl.style.display = "none";
+  splash.style.display = "flex";
+  let s = 0;
+  const iv = setInterval(()=>{
+    if(bootDone){ clearInterval(iv); return; }
+    s++;
+    if(s >= statusLines.length){ clearInterval(iv); finishBoot(); }
+    else bootstatus.textContent = statusLines[s];
+  }, 650);
+}
+function finishBoot(){
+  if(bootDone) return;
+  bootDone = true;
+  biosEl.style.display = "none";
+  splash.style.display = "none";
+  skipBtn.style.display = "none";
+  document.body.classList.remove("booting");
+  desktop.classList.add("on");
+}
+skipBtn.addEventListener("click", finishBoot);
+document.addEventListener("keydown", e=>{ if(e.key==="Escape" && !bootDone) finishBoot(); });
+runBios();
+
+/* ================= CLOCK ================= */
+const clock = document.getElementById("clock");
+function tick(){
+  const d = new Date();
+  let h = d.getHours(), m = String(d.getMinutes()).padStart(2,"0");
+  const ap = h>=12 ? "PM":"AM"; h = h%12 || 12;
+  clock.textContent = h + ":" + m + " " + ap;
+}
+tick(); setInterval(tick, 10000);
+
+/* ================= CHART ================= */
+(function(){
+  const svg = document.getElementById("chart");
+  let x = 4, y = 70;
+  for(let i=0;i<18;i++){
+    const open = y, close = Math.max(8, y - (Math.random()*10 - 2));
+    svg.innerHTML += `<line x1="${x+3}" y1="${Math.min(open,close)-4}" x2="${x+3}" y2="${Math.max(open,close)+4}" stroke="#1a9e3c" stroke-width="1"/>
+      <rect x="${x}" y="${Math.min(open,close)}" width="6" height="${Math.max(2,Math.abs(open-close))}" fill="${close<open?'#1a9e3c':'#e05a2b'}"/>`;
+    y = close; x += 10;
+  }
+})();
+
+/* ================= MEME CAROUSEL — infinite rotation ================= */
+const memescroll = document.getElementById("memescroll");
+const mtrack = document.createElement("div");
+mtrack.className = "mtrack";
+memescroll.appendChild(mtrack);
+
+function memeTile(m, i){
+  const el = document.createElement("div");
+  el.className = "meme";
+  el.innerHTML = `
+    <div class="mimg">
+      <img src="assets/meme-${i+1}.png" alt="${m.cap}" onerror="this.remove()">
+      <div class="ph">
+        <div class="num">MEME ${String(i+1).padStart(2,"0")}</div>
+        <div>assets/meme-${i+1}.png</div>
+      </div>
+    </div>`;
+  el.title = "Nano Banana prompt: " + m.prompt;
+  return el;
+}
+/* two copies of the set = seamless wrap point at the halfway mark */
+MEMES.forEach((m,i)=>mtrack.appendChild(memeTile(m,i)));
+MEMES.forEach((m,i)=>mtrack.appendChild(memeTile(m,i)));
+
+const TILE_W = 250; // 240px tile + 10px gap
+const LOOP_W = TILE_W * MEMES.length;
+let off = 0, paused = false, lastMs = 0;
+const AUTO_PX_S = matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 28;
+
+memescroll.addEventListener("pointerenter", ()=>paused = true);
+memescroll.addEventListener("pointerleave", ()=>paused = false);
+
+document.querySelectorAll("[data-scroll]").forEach(b=>{
+  b.addEventListener("click", ()=>{ off += TILE_W * (+b.dataset.scroll); });
+});
+
+function spin(ms){
+  const dt = Math.min(0.05, (ms - lastMs) / 1000);
+  lastMs = ms;
+  if(!paused) off += AUTO_PX_S * dt;
+  off = ((off % LOOP_W) + LOOP_W) % LOOP_W; // wrap both directions
+  mtrack.style.transform = "translateX(" + (-off) + "px)";
+  requestAnimationFrame(spin);
+}
+requestAnimationFrame(spin);
+/* if a real image loads, hide that tile's placeholder */
+document.querySelectorAll(".slot img, .mimg img").forEach(img=>{
+  img.addEventListener("load", ()=>{
+    const ph = img.parentElement.querySelector(".ph");
+    if(ph) ph.style.display = "none";
+  });
+});
+/* video: show player only when the file exists */
+const vid = document.getElementById("thevideo");
+vid.addEventListener("loadedmetadata", ()=>{ document.getElementById("vidph").style.display = "none"; });
+vid.addEventListener("error", ()=>{ vid.style.display = "none"; });
+
+/* ================= NAV / STATUS ================= */
+const winbody = document.getElementById("winbody");
+const statusmsg = document.getElementById("statusmsg");
+function setStatus(m){ statusmsg.textContent = m; }
+document.getElementById("ca-side").textContent = CFG.ca;
+document.querySelectorAll("[data-goto]").forEach(b=>{
+  b.addEventListener("click", ()=>{
+    const id = b.dataset.goto === "top" ? "sec-top" : "sec-" + b.dataset.goto;
+    document.getElementById(id).scrollIntoView({behavior:"smooth", block:"start"});
+    setStatus("Navigating to " + b.dataset.goto + " ...");
+  });
+});
+
+/* ================= DIALOGS ================= */
+let zTop = 100;
+function makeDlg(title, innerHTML, buttons){
+  const dlg = document.createElement("div");
+  dlg.className = "win dlg";
+  dlg.style.left = Math.max(8, 140 + Math.random()*140) + "px";
+  dlg.style.top = Math.max(8, 60 + Math.random()*70) + "px";
+  dlg.style.zIndex = ++zTop;
+  dlg.innerHTML = `
+    <div class="titlebar" data-dragme>
+      <span class="ttext">${title}</span>
+      <button class="tbtn" data-closeme aria-label="Close">X</button>
+    </div>
+    <div class="content2">${innerHTML}</div>
+    <div class="btnrow">${buttons || '<button data-closeme>OK</button>'}</div>`;
+  desktop.appendChild(dlg);
+  makeDraggable(dlg, dlg.querySelector("[data-dragme]"));
+  dlg.addEventListener("click", e=>{
+    if(e.target.closest("[data-closeme]")) dlg.remove();
+    else dlg.style.zIndex = ++zTop;
+  });
+}
+
+/* ================= ACTIONS ================= */
+function copyCA(){
+  navigator.clipboard?.writeText(CFG.ca).then(
+    ()=>setStatus("CA copied. good luck soldier."),
+    ()=>setStatus("Copy blocked — grab it from CA.txt manually")
+  );
+}
+function doAct(act){
+  startmenu.classList.remove("open");
+  if(act==="browser") openBrowser();
+  else if(act==="buy"){ window.open(CFG.links.buy, "_blank"); setStatus("Opening pump.fun ..."); }
+  else if(act==="tg") window.open(CFG.links.tg, "_blank");
+  else if(act==="community"){ window.open(CFG.links.community, "_blank"); setStatus("Joining the official community ..."); }
+  else if(act==="copensub") window.open("https://www.reddit.com/r/" + CFG.subreddit + "/", "_blank");
+  else if(act==="copyca") copyCA();
+  else if(act==="ca"){
+    makeDlg("CA.txt — Notepad", `
+      <div style="margin-bottom:6px;">official ${CFG.ticker} contract address:</div>
+      <div class="ca-field sunken" style="white-space:normal;word-break:break-all;">${CFG.ca}</div>
+      <div style="color:var(--muted);margin-top:6px;">verify on DexScreener before buying. always.</div>`,
+      `<button data-act="copyca">Copy</button><button data-closeme>Close</button>`);
+  }
+  else if(act==="howto"){
+    makeDlg("How to buy — Wizard", `
+      <div class="stepline"><div class="n">1</div><div>get a Solana wallet (Phantom works)</div></div>
+      <div class="stepline"><div class="n">2</div><div>load it with SOL from any exchange</div></div>
+      <div class="stepline"><div class="n">3</div><div>paste the CA into pump.fun or your DEX</div></div>
+      <div class="stepline"><div class="n">4</div><div>swap. hold. do not check the chart hourly (you will)</div></div>`,
+      `<button data-act="buy">Finish - Buy</button><button data-closeme>Cancel</button>`);
+  }
+  else if(act==="recycle") makeDlg("Recycle Bin", `<div>contents: <b>all of the fud</b> (permanently deleted)</div>`);
+  else if(act==="reboot") location.reload();
+}
+document.addEventListener("click", e=>{
+  const act = e.target.closest("[data-act]");
+  if(act) doAct(act.dataset.act);
+});
+document.querySelectorAll(".dicon").forEach(el=>{
+  el.addEventListener("keydown", e=>{ if(e.key==="Enter") doAct(el.dataset.act); });
+});
+
+/* ================= LINKS ================= */
+const linkbox = document.getElementById("linkbox");
+[["X","Twitter / X", CFG.links.x],
+ ["TG","Telegram", CFG.links.tg],
+ ["DX","DexScreener", CFG.links.dex],
+ ["PF","pump.fun", CFG.links.buy]].forEach(([tag,label,url])=>{
+  const row = document.createElement("div");
+  row.className = "linkrow";
+  row.innerHTML = `<b style="width:20px;">${tag}</b><span>${label}</span>`;
+  row.addEventListener("click", ()=>window.open(url,"_blank"));
+  linkbox.appendChild(row);
+});
+
+/* ================= DRAG + WINDOWS ================= */
+function makeDraggable(win, handle){
+  let sx, sy, ox, oy, dragging=false;
+  handle.addEventListener("pointerdown", e=>{
+    if(e.target.closest("button")) return;
+    dragging = true;
+    sx=e.clientX; sy=e.clientY;
+    const r = win.getBoundingClientRect(); ox=r.left; oy=r.top;
+    win.style.zIndex = ++zTop;
+    handle.setPointerCapture(e.pointerId);
+  });
+  handle.addEventListener("pointermove", e=>{
+    if(!dragging) return;
+    win.style.left = Math.max(-100, ox + e.clientX - sx) + "px";
+    win.style.top = Math.max(0, oy + e.clientY - sy) + "px";
+  });
+  handle.addEventListener("pointerup", ()=>dragging=false);
+}
+const browser = document.getElementById("browser");
+makeDraggable(browser, browser.querySelector("[data-drag]"));
+browser.addEventListener("pointerdown", ()=>{ browser.style.zIndex = ++zTop; });
+
+const taskBrowser = document.getElementById("task-browser");
+browser.querySelector("[data-close]").addEventListener("click", ()=>{
+  browser.style.display="none"; taskBrowser.classList.remove("active");
+});
+function openBrowser(){
+  browser.style.display="flex"; browser.style.zIndex = ++zTop;
+  taskBrowser.classList.add("active");
+}
+taskBrowser.addEventListener("click", ()=>{
+  if(browser.style.display==="none") openBrowser();
+  else { browser.style.display="none"; taskBrowser.classList.remove("active"); }
+});
+
+/* ================= START MENU ================= */
+const startmenu = document.getElementById("startmenu");
+document.getElementById("startbtn").addEventListener("click", e=>{
+  e.stopPropagation(); startmenu.classList.toggle("open");
+});
+document.addEventListener("click", e=>{
+  if(!e.target.closest("#startmenu") && !e.target.closest("#startbtn")) startmenu.classList.remove("open");
+});
+
+/* ================= WEBGL BACKGROUND — red/white pulse ================= */
+(function(){
+  const canvas = document.getElementById("bg");
+  const gl = canvas.getContext("webgl", {antialias:false, alpha:false});
+  if(!gl) return; // CSS gradient fallback stays
+
+  const vs = "attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}";
+  const fs = `
+precision mediump float;
+uniform vec2 r;
+uniform float t;
+void main(){
+  vec2 uv = gl_FragCoord.xy / r;
+  float asp = r.x / r.y;
+  uv.x *= asp;
+  vec2 c1 = vec2(0.32*asp, 0.68) + 0.14*vec2(sin(t*0.31), cos(t*0.23));
+  vec2 c2 = vec2(0.74*asp, 0.28) + 0.17*vec2(cos(t*0.19), sin(t*0.26));
+  vec2 c3 = vec2(0.50*asp, 0.50) + 0.10*vec2(sin(t*0.13+2.0), cos(t*0.17+1.0));
+  float pulse = 0.5 + 0.5*sin(t*0.7);
+  float g = 0.0;
+  g += smoothstep(0.95, 0.0, distance(uv, c1)) * (0.50 + 0.22*pulse);
+  g += smoothstep(1.10, 0.0, distance(uv, c2)) * (0.42 + 0.22*(1.0-pulse));
+  g += smoothstep(0.80, 0.0, distance(uv, c3)) * 0.30;
+  g += 0.05*sin(9.0*distance(uv, c3) - t*1.4);
+  g = clamp(g, 0.0, 1.0);
+  vec3 red    = vec3(0.95, 0.20, 0.00);
+  vec3 orange = vec3(1.00, 0.45, 0.05);
+  vec3 white  = vec3(1.00, 0.96, 0.92);
+  vec3 col = mix(red, orange, smoothstep(0.0, 0.65, g));
+  col = mix(col, white, smoothstep(0.80, 1.0, g));
+  gl_FragColor = vec4(col, 1.0);
+}`;
+  function sh(type, src){
+    const s = gl.createShader(type);
+    gl.shaderSource(s, src); gl.compileShader(s);
+    return s;
+  }
+  const prog = gl.createProgram();
+  gl.attachShader(prog, sh(gl.VERTEX_SHADER, vs));
+  gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, fs));
+  gl.linkProgram(prog);
+  if(!gl.getProgramParameter(prog, gl.LINK_STATUS)) return;
+  gl.useProgram(prog);
+
+  const buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
+  const loc = gl.getAttribLocation(prog, "p");
+  gl.enableVertexAttribArray(loc);
+  gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+  const uR = gl.getUniformLocation(prog, "r");
+  const uT = gl.getUniformLocation(prog, "t");
+  const slow = matchMedia("(prefers-reduced-motion: reduce)").matches ? 0.2 : 1;
+
+  function resize(){
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    canvas.width = Math.floor(innerWidth * dpr);
+    canvas.height = Math.floor(innerHeight * dpr);
+    gl.viewport(0, 0, canvas.width, canvas.height);
+  }
+  addEventListener("resize", resize);
+  resize();
+
+  function frame(ms){
+    gl.uniform2f(uR, canvas.width, canvas.height);
+    gl.uniform1f(uT, ms * 0.001 * slow);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+
+/* ================= COMMUNITY WINDOW — reddit api ================= */
+const cwin = document.getElementById("community");
+const taskComm = document.getElementById("task-community");
+makeDraggable(cwin, cwin.querySelector("[data-drag]"));
+cwin.addEventListener("pointerdown", ()=>{ cwin.style.zIndex = ++zTop; });
+cwin.querySelector("[data-close]").addEventListener("click", ()=>{
+  cwin.style.display = "none"; taskComm.classList.remove("active");
+});
+taskComm.addEventListener("click", ()=>{
+  if(cwin.style.display === "none"){
+    cwin.style.display = "flex"; cwin.style.zIndex = ++zTop;
+    taskComm.classList.add("active");
+  } else {
+    cwin.style.display = "none"; taskComm.classList.remove("active");
+  }
+});
+
+const DEMO_POSTS = [
+  {title:"the mascot has entered the trenches. this is not a drill", author:"dev", score:1998, num_comments:64, permalink:"/"},
+  {title:"twenty-one years of unpaid front page labor ends today", author:"snoofi_enjoyer", score:847, num_comments:41, permalink:"/"},
+  {title:"POV: you checked the cap table and found a sticker sheet", author:"cap_table_watcher", score:715, num_comments:33, permalink:"/"},
+  {title:"LP burned. mint revoked. smile permanent.", author:"dev", score:666, num_comments:27, permalink:"/"},
+  {title:"antenna is picking up liquidity again", author:"antenna_tech", score:520, num_comments:19, permalink:"/"},
+  {title:"day 1 of the mascot being financial: still financial", author:"holder_no_1337", score:431, num_comments:15, permalink:"/"}
+];
+
+function escapeHtml(str){
+  const d = document.createElement("div");
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+function renderCFeed(posts){
+  const feedEl = document.getElementById("cfeed");
+  feedEl.innerHTML = "";
+  posts.forEach(d=>{
+    const row = document.createElement("div");
+    row.className = "crow";
+    const score = d.score >= 1000 ? (d.score/1000).toFixed(1).replace(/\.0$/,"") + "k" : d.score;
+    row.innerHTML = `
+      <div class="cscore">${score}</div>
+      <div class="cbody">
+        <div class="ctitle">${escapeHtml(d.title)}</div>
+        <div class="cmeta">u/${escapeHtml(d.author)} - ${d.num_comments} comments</div>
+      </div>`;
+    row.addEventListener("click", ()=>window.open("https://www.reddit.com" + d.permalink, "_blank"));
+    feedEl.appendChild(row);
+  });
+}
+
+async function loadCommunity(){
+  const sub = CFG.subreddit;
+  const cstatus = document.getElementById("cstatus");
+  const stats = document.getElementById("cstats");
+  document.getElementById("csub").textContent = "r/" + sub;
+  document.getElementById("ctitlebar").textContent = "r/" + sub.toUpperCase() + " — Community Monitor";
+  cstatus.textContent = "Fetching r/" + sub + " ...";
+  try{
+    const [aboutR, hotR] = await Promise.all([
+      fetch("https://www.reddit.com/r/" + sub + "/about.json?raw_json=1"),
+      fetch("https://www.reddit.com/r/" + sub + "/hot.json?limit=15&raw_json=1")
+    ]);
+    if(!aboutR.ok || !hotR.ok) throw new Error("http " + aboutR.status + "/" + hotR.status);
+    const about = (await aboutR.json()).data;
+    const hot = (await hotR.json()).data.children
+      .map(c=>c.data)
+      .filter(d=>!d.stickied)
+      .slice(0, 10);
+    stats.innerHTML = `
+      <div class="stat"><span>members</span><b>${(about.subscribers||0).toLocaleString()}</b></div>
+      <div class="stat"><span>online</span><b>${(about.accounts_active||about.active_user_count||0).toLocaleString()}</b></div>`;
+    renderCFeed(hot);
+    cstatus.textContent = "Live from r/" + sub;
+  }catch(err){
+    stats.innerHTML = `
+      <div class="stat"><span>members</span><b>1,337</b></div>
+      <div class="stat"><span>online</span><b>420</b></div>`;
+    renderCFeed(DEMO_POSTS);
+    cstatus.textContent = "reddit api unreachable — demo data";
+  }
+}
+document.querySelectorAll("[data-act='crefresh']").forEach(b=>{
+  b.addEventListener("click", loadCommunity);
+});
+loadCommunity();
+</script>
+</body>
+</html>

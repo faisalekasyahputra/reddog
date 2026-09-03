@@ -1,0 +1,10 @@
+node_modules/
+.next/
+out/
+.pnpm-store/
+.superpowers/
+.vercel/
+.env*
+!.env.example
+*.tsbuildinfo
+next-env.d.ts
