@@ -543,7 +543,7 @@ void main(){
               <div className="content">
                 <section id="sec-top">
                   <div className="slot hero sunken">
-                    <Image src="/assets/hero-snoofi.jpg" alt="Snoofi dogs under a SNOOFI stop sign, one holding a phone showing the Robinhood logo" width={1600} height={533} priority sizes="(max-width: 780px) 100vw, 900px" />
+                    <Image src="/assets/hero-snoofi.png" alt="Snoofi dogs under a SNOOFI stop sign, one holding a phone showing the Robinhood logo" width={3168} height={1056} quality={100} priority sizes="(max-width: 780px) 100vw, 900px" />
                   </div>
                 </section>
 
