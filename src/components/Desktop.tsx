@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { CSSProperties, KeyboardEvent, PointerEvent } from "react";
 import type { RedditData } from "@/lib/reddit";
-import { getBuyUrl, useProjectConfig } from "@/lib/useProjectConfig";
+import { dexEmbedUrl, getBuyUrl, useProjectConfig } from "@/lib/useProjectConfig";
 
 const memes = [
   "Two suited Snoofi mascots look down from an alley",
@@ -47,7 +47,6 @@ const statusLines = [
   "loading front page...",
 ];
 
-const chartCloses = [66, 61, 63, 57, 52, 54, 48, 43, 45, 39, 34, 36, 30, 25, 27, 20, 15, 11];
 const tileWidth = 250;
 const loopWidth = tileWidth * memes.length;
 
@@ -83,6 +82,15 @@ export default function Desktop({ subreddit }: { subreddit: string }) {
   const ca = config?.contract_address || "";
   const caLabel = ca || "Coming Soon";
   const buyUrl = getBuyUrl(config);
+  const chartEmbed = dexEmbedUrl(config?.dexscreener_url);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [muted, setMuted] = useState(true);
+  const toggleMute = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.muted = !video.muted;
+    setMuted(video.muted);
+  };
   // telegram_url doubles as the reddit source when it points at reddit.com (see lib/reddit.ts)
   const telegramUrl = config?.telegram_url && !/reddit\.com/i.test(config.telegram_url) ? config.telegram_url : null;
   const links = [
@@ -508,12 +516,12 @@ void main(){
         <div className="win" id="browser" style={windowStyle("browser")} onPointerDown={() => bringToFront("browser")}>
           <div className="titlebar" onPointerDown={(event) => beginDrag(event, "browser")} onPointerMove={moveDrag} onPointerUp={endDrag} onPointerCancel={endDrag}>
             <svg width="16" height="14" viewBox="0 0 110 96"><use href="#i-snoo" /></svg>
-            <span className="ttext">$SNOOFI - THE OFFICIAL REDDIT MASCOT</span>
+            <span className="ttext">$SNOOFI</span>
             <button type="button" className="tbtn" aria-label="Minimize" onClick={() => setWindowVisible("browser", false)}>_</button>
             <button type="button" className="tbtn" aria-label="Close" onClick={() => setWindowVisible("browser", false)}>X</button>
           </div>
           <div className="menubar"><span><u>F</u>ile</span><span><u>E</u>dit</span><span><u>V</u>iew</span><span><u>A</u>pe</span><span><u>H</u>odl</span></div>
-          <div className="addrbar"><span>Address</span><div className="field sunken" id="addr">http://www.snoofi.wtf/</div><button type="button" className="bold">Go</button></div>
+          <div className="addrbar"><span>Address</span><div className="field sunken" id="addr">http://www.snoofi.wtf/</div></div>
           <div className="winbody" id="winbody" ref={winBodyRef}>
             <div className="r-head">
               <div className="r-logo" role="button" tabIndex={0} onClick={() => navigateTo("top")} onKeyDown={(event) => onActionKey(event, "top")}>
@@ -547,8 +555,8 @@ void main(){
                   <div className="sechead"><h2>VIDEO</h2><div className="rule" /></div>
                   <div className="player">
                     <div className="pbar"><span>snoofi.mp4</span><span>1998 kbps</span></div>
-                    <div className="slot vid sunken"><video src="/assets/video/snoofi-hero.mp4" autoPlay muted loop playsInline controls preload="metadata" aria-label="Snoofi hero video" /></div>
-                    <div className="controls"><button type="button">&#9658;</button><button type="button">&#10074;&#10074;</button><button type="button">&#9632;</button><div className="track" /><button type="button">Full</button></div>
+                    <div className="slot vid sunken"><video ref={videoRef} src="/assets/video/snoofi-hero.mp4" autoPlay muted loop playsInline controls preload="metadata" aria-label="Snoofi hero video" /></div>
+                    <div className="controls"><button type="button" aria-label="play" onClick={() => void videoRef.current?.play()}>&#9658;</button><button type="button" aria-label="pause" onClick={() => videoRef.current?.pause()}>&#10074;&#10074;</button><button type="button" onClick={toggleMute}>{muted ? "Unmute" : "Mute"}</button><div className="track" /></div>
                   </div>
                 </section>
 
@@ -571,14 +579,14 @@ void main(){
               </div>
 
               <div className="r-side">
+                <div className="sbox"><h3>Links</h3><div className="inner" id="linkbox">{links.map(([tag, label, url]) => <button type="button" className="linkrow" key={label} onClick={() => openExternal(url)}><img className="linkico" src={`https://icon.horse/icon/${new URL(url).hostname}`} width={16} height={16} alt={tag} /><span>{label}</span></button>)}</div></div>
+                <div className="sbox"><h3>Official Community</h3><div className="inner"><div className="community-copy">the official $SNOOFI community. mascot enjoyers only.</div><div className="stat"><span>members</span><b>growing</b></div><div className="stat"><span>fud</span><b>0</b></div><button type="button" className="bigbtn buy" onClick={() => act("community")}>JOIN COMMUNITY</button></div></div>
                 <div className="sbox"><h3>$SNOOFI</h3><div className="inner">
                   <div className="stat"><span>supply</span><b>1,000,000,000</b></div><div className="stat"><span>tax</span><b>0 / 0</b></div><div className="stat"><span>LP</span><b>burned</b></div><div className="stat"><span>mint</span><b>revoked</b></div>
                   <div className="contract-label">contract address</div><div className="ca-field sunken" id="ca-side">{caLabel}</div>
                   <button type="button" className="bigbtn" onClick={() => act("copyca")}>Copy CA</button>{buyUrl && <button type="button" className="bigbtn buy" onClick={() => act("buy")}>BUY $SNOOFI</button>}
                 </div></div>
-                <div className="sbox"><h3>Official Community</h3><div className="inner"><div className="community-copy">the official $SNOOFI community. mascot enjoyers only.</div><div className="stat"><span>members</span><b>growing</b></div><div className="stat"><span>fud</span><b>0</b></div><button type="button" className="bigbtn buy" onClick={() => act("community")}>JOIN COMMUNITY</button></div></div>
-                <div className="sbox"><h3>Links</h3><div className="inner" id="linkbox">{links.map(([tag, label, url]) => <button type="button" className="linkrow" key={label} onClick={() => openExternal(url)}><img className="linkico" src={`https://icon.horse/icon/${new URL(url).hostname}`} width={16} height={16} alt={tag} /><span>{label}</span></button>)}</div></div>
-                <div className="sbox"><h3>Chart (trust me)</h3><div className="inner"><div className="chartwrap sunken"><svg id="chart" width="100%" height="80" viewBox="0 0 180 80" preserveAspectRatio="none">{chartCloses.map((close, index) => { const open = index ? chartCloses[index - 1] : 70; const x = 4 + index * 10; return <g key={x}><line x1={x + 3} y1={Math.min(open, close) - 4} x2={x + 3} y2={Math.max(open, close) + 4} stroke="#1a9e3c" strokeWidth="1" /><rect x={x} y={Math.min(open, close)} width="6" height={Math.max(2, Math.abs(open - close))} fill={close < open ? "#1a9e3c" : "#e05a2b"} /></g>; })}</svg></div><div className="chart-caption">up only (financial advice)</div></div></div>
+                {chartEmbed && <div className="sbox"><h3>$SNOOFI Chart</h3><div className="inner"><div className="chartwrap sunken"><iframe src={chartEmbed} title="$SNOOFI chart on DexScreener" loading="lazy" /></div></div></div>}
               </div>
             </div>
           </div>
