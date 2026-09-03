@@ -4,18 +4,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { CSSProperties, KeyboardEvent, PointerEvent } from "react";
 import type { RedditData } from "@/lib/reddit";
-
-const config = {
-  ticker: "$SNOOFI",
-  ca: "SNoo98xXxPLACEHOLDERxXxPASTExREALxCAxHEREpump",
-  links: {
-    buy: "https://pump.fun/",
-    x: "https://x.com/",
-    tg: "https://t.me/",
-    community: "https://t.me/",
-    dex: "https://dexscreener.com/",
-  },
-};
+import { getBuyUrl, useProjectConfig } from "@/lib/useProjectConfig";
 
 const memes = [
   "Two suited Snoofi mascots look down from an alley",
@@ -36,13 +25,6 @@ const memes = [
   src: `/assets/memes/meme-${String(index + 1).padStart(2, "0")}.avif`,
   alt,
 }));
-
-const links = [
-  ["X", "Twitter / X", config.links.x],
-  ["TG", "Telegram", config.links.tg],
-  ["DX", "DexScreener", config.links.dex],
-  ["PF", "pump.fun", config.links.buy],
-] as const;
 
 const biosLines = [
   { text: "SNOOFI BIOS (C) 1998-2026, Trench Software Inc.", delay: 60 },
@@ -97,6 +79,16 @@ export default function Desktop({ subreddit }: { subreddit: string }) {
   const [windowZ, setWindowZ] = useState<Record<WindowName, number>>({ browser: 101, community: 102 });
   const [startOpen, setStartOpen] = useState(false);
   const [status, setStatus] = useState("Done");
+  const { config } = useProjectConfig();
+  const ca = config?.contract_address || "";
+  const caLabel = ca || "Coming Soon";
+  const buyUrl = getBuyUrl(config);
+  const links = [
+    ["X", "Twitter / X", config?.twitter_url],
+    ["TG", "Telegram", config?.telegram_url],
+    ["DX", "Chart", config?.dexscreener_url],
+    ["PF", "Buy", buyUrl],
+  ].filter((row): row is [string, string, string] => Boolean(row[2]));
   const [reddit, setReddit] = useState<RedditData | null>(null);
   const [redditLoading, setRedditLoading] = useState(true);
   const [redditError, setRedditError] = useState<string | null>(null);
@@ -371,17 +363,16 @@ void main(){
 
   const openDialog = (kind: DialogKind) => {
     const id = ++dialogId.current;
-    const left = Math.max(8, 140 + Math.random() * 140);
-    const top = Math.max(8, 60 + Math.random() * 70);
-    setDialogs((current) => [...current, { id, kind, left, top, z: ++zTop.current }]);
+    setDialogs((current) => [...current, { id, kind, left: Math.max(8, 140 + Math.random() * 140), top: Math.max(8, 60 + Math.random() * 70), z: ++zTop.current }]);
   };
 
   const closeDialog = (id: number) => setDialogs((current) => current.filter((dialog) => dialog.id !== id));
 
   const copyContract = async () => {
     try {
+      if (!ca) throw new Error("No CA yet");
       if (!navigator.clipboard) throw new Error("Clipboard unavailable");
-      await navigator.clipboard.writeText(config.ca);
+      await navigator.clipboard.writeText(ca);
       setStatus("CA copied. good luck soldier.");
     } catch {
       setStatus("Copy blocked — grab it from CA.txt manually");
@@ -403,11 +394,14 @@ void main(){
     if (action === "browser") setWindowVisible("browser", true);
     else if (action === "top") navigateTo("top");
     else if (action === "buy") {
-      openExternal(config.links.buy);
-      setStatus("Opening pump.fun ...");
-    } else if (action === "tg") openExternal(config.links.tg);
-    else if (action === "community") {
-      openExternal(config.links.community);
+      if (!buyUrl) return setStatus("Buy not live yet. patience.");
+      openExternal(buyUrl);
+      setStatus(`Opening ${config?.buy_platform} ...`);
+    } else if (action === "tg") {
+      if (config?.telegram_url) openExternal(config.telegram_url);
+    } else if (action === "community") {
+      if (!config?.community_url) return setStatus("Community link coming soon.");
+      openExternal(config.community_url);
       setStatus("Joining the official community ...");
     } else if (action === "copensub") openExternal(communityUrl);
     else if (action === "copyca") void copyContract();
@@ -500,9 +494,9 @@ void main(){
 
       <div id="desktop" className={bootStage === "done" ? "on" : ""}>
         <div className="dicons">
-          <div className="dicon" tabIndex={0} role="button" onClick={() => act("buy")} onKeyDown={(event) => onActionKey(event, "buy")}>
+          {buyUrl && <div className="dicon" tabIndex={0} role="button" onClick={() => act("buy")} onKeyDown={(event) => onActionKey(event, "buy")}>
             <svg width="32" height="32" viewBox="0 0 32 32"><use href="#i-cart" /></svg><span className="lbl">buy.exe</span>
-          </div>
+          </div>}
           <div className="dicon" tabIndex={0} role="button" onClick={() => act("ca")} onKeyDown={(event) => onActionKey(event, "ca")}>
             <svg width="32" height="32" viewBox="0 0 32 32"><use href="#i-doc" /></svg><span className="lbl">CA.txt</span>
           </div>
@@ -532,7 +526,7 @@ void main(){
                 <button type="button" onClick={() => navigateTo("lore")}>LORE</button>
                 <button type="button" onClick={() => navigateTo("video")}>VIDEO</button>
                 <button type="button" onClick={() => navigateTo("memes")}>MEMES</button>
-                <button type="button" className="buy" onClick={() => act("buy")}>BUY</button>
+                {buyUrl && <button type="button" className="buy" onClick={() => act("buy")}>BUY</button>}
               </div>
             </div>
 
@@ -582,11 +576,11 @@ void main(){
               <div className="r-side">
                 <div className="sbox"><h3>$SNOOFI</h3><div className="inner">
                   <div className="stat"><span>supply</span><b>1,000,000,000</b></div><div className="stat"><span>tax</span><b>0 / 0</b></div><div className="stat"><span>LP</span><b>burned</b></div><div className="stat"><span>mint</span><b>revoked</b></div>
-                  <div className="contract-label">contract address</div><div className="ca-field sunken" id="ca-side">{config.ca}</div>
-                  <button type="button" className="bigbtn" onClick={() => act("copyca")}>Copy CA</button><button type="button" className="bigbtn buy" onClick={() => act("buy")}>BUY $SNOOFI</button>
+                  <div className="contract-label">contract address</div><div className="ca-field sunken" id="ca-side">{caLabel}</div>
+                  <button type="button" className="bigbtn" onClick={() => act("copyca")}>Copy CA</button>{buyUrl && <button type="button" className="bigbtn buy" onClick={() => act("buy")}>BUY $SNOOFI</button>}
                 </div></div>
                 <div className="sbox"><h3>Official Community</h3><div className="inner"><div className="community-copy">the official $SNOOFI community. mascot enjoyers only.</div><div className="stat"><span>members</span><b>growing</b></div><div className="stat"><span>fud</span><b>0</b></div><button type="button" className="bigbtn buy" onClick={() => act("community")}>JOIN COMMUNITY</button></div></div>
-                <div className="sbox"><h3>Links</h3><div className="inner" id="linkbox">{links.map(([tag, label, url]) => <button type="button" className="linkrow" key={label} onClick={() => openExternal(url)}><b>{tag}</b><span>{label}</span></button>)}</div></div>
+                <div className="sbox"><h3>Links</h3><div className="inner" id="linkbox">{links.map(([tag, label, url]) => <button type="button" className="linkrow" key={label} onClick={() => openExternal(url)}><img className="linkico" src={`https://icon.horse/icon/${new URL(url).hostname}`} width={16} height={16} alt={tag} /><span>{label}</span></button>)}</div></div>
                 <div className="sbox"><h3>Chart (trust me)</h3><div className="inner"><div className="chartwrap sunken"><svg id="chart" width="100%" height="80" viewBox="0 0 180 80" preserveAspectRatio="none">{chartCloses.map((close, index) => { const open = index ? chartCloses[index - 1] : 70; const x = 4 + index * 10; return <g key={x}><line x1={x + 3} y1={Math.min(open, close) - 4} x2={x + 3} y2={Math.max(open, close) + 4} stroke="#1a9e3c" strokeWidth="1" /><rect x={x} y={Math.min(open, close)} width="6" height={Math.max(2, Math.abs(open - close))} fill={close < open ? "#1a9e3c" : "#e05a2b"} /></g>; })}</svg></div><div className="chart-caption">up only (financial advice)</div></div></div>
               </div>
             </div>
@@ -615,20 +609,20 @@ void main(){
               ))}
             </div>
           </div>
-          <div className="statusbar"><div className="pane" id="cstatus">{redditLoading ? "loading" : redditError ? "connection failed" : `last synced ${reddit ? formatClock(new Date(reddit.fetchedAt)) : "--:--"} — ${reddit?.posts.length ?? 0} hot posts`}</div><div className="pane sm"><button type="button" className="refresh-btn" onClick={retryReddit}>{redditError ? "Retry" : "Refresh"}</button></div></div>
+          <div className="statusbar"><div className="pane" id="cstatus">{redditLoading ? "loading" : redditError ? "connection failed" : reddit?.source === "manual" ? `curated feed — ${reddit.posts.length} posts` : reddit?.source === "apify" ? `synced ${formatClock(new Date(reddit.fetchedAt))} — ${reddit.posts.length} hot posts` : `last synced ${reddit ? formatClock(new Date(reddit.fetchedAt)) : "--:--"} — ${reddit?.posts.length ?? 0} hot posts`}</div><div className="pane sm"><button type="button" className="refresh-btn" onClick={retryReddit}>{redditError ? "Retry" : "Refresh"}</button></div></div>
         </div>
 
         {dialogs.map((dialog) => (
           <div className="win dlg" key={dialog.id} style={{ left: dialog.left, top: dialog.top, zIndex: dialog.z }} onPointerDown={() => { const z = ++zTop.current; setDialogs((current) => current.map((item) => item.id === dialog.id ? { ...item, z } : item)); }}>
             <div className="titlebar" onPointerDown={(event) => beginDrag(event, dialog.id)} onPointerMove={moveDrag} onPointerUp={endDrag} onPointerCancel={endDrag}><span className="ttext">{dialog.kind === "ca" ? "CA.txt — Notepad" : dialog.kind === "howto" ? "How to buy — Wizard" : "Recycle Bin"}</span><button type="button" className="tbtn" aria-label="Close" onClick={() => closeDialog(dialog.id)}>X</button></div>
             <div className="content2">
-              {dialog.kind === "ca" && <><div className="dialog-copy">official {config.ticker} contract address:</div><div className="ca-field sunken wrap-ca">{config.ca}</div><div className="dialog-note">verify on DexScreener before buying. always.</div></>}
+              {dialog.kind === "ca" && <><div className="dialog-copy">official $SNOOFI contract address:</div><div className="ca-field sunken wrap-ca">{caLabel}</div><div className="dialog-note">verify on DexScreener before buying. always.</div></>}
               {dialog.kind === "howto" && <><div className="stepline"><div className="n">1</div><div>get a Solana wallet (Phantom works)</div></div><div className="stepline"><div className="n">2</div><div>load it with SOL from any exchange</div></div><div className="stepline"><div className="n">3</div><div>paste the CA into pump.fun or your DEX</div></div><div className="stepline"><div className="n">4</div><div>swap. hold. do not check the chart hourly (you will)</div></div></>}
               {dialog.kind === "recycle" && <div>contents: <b>all of the fud</b> (permanently deleted)</div>}
             </div>
             <div className="btnrow">
               {dialog.kind === "ca" && <button type="button" onClick={() => act("copyca")}>Copy</button>}
-              {dialog.kind === "howto" && <button type="button" onClick={() => act("buy")}>Finish - Buy</button>}
+              {dialog.kind === "howto" && buyUrl && <button type="button" onClick={() => act("buy")}>Finish - Buy</button>}
               <button type="button" onClick={() => closeDialog(dialog.id)}>{dialog.kind === "howto" ? "Cancel" : dialog.kind === "ca" ? "Close" : "OK"}</button>
             </div>
           </div>
@@ -645,7 +639,7 @@ void main(){
       <div className={`win${startOpen ? " open" : ""}`} id="startmenu">
         <div className="rail">$SNOOFI&nbsp;98</div>
         <div className="items">
-          <button type="button" className="item" onClick={() => act("buy")}><svg width="18" height="18" viewBox="0 0 32 32" className="start-cart"><use href="#i-cart" /></svg><span>Buy $SNOOFI</span></button>
+          {buyUrl && <button type="button" className="item" onClick={() => act("buy")}><svg width="18" height="18" viewBox="0 0 32 32" className="start-cart"><use href="#i-cart" /></svg><span>Buy $SNOOFI</span></button>}
           <button type="button" className="item" onClick={() => act("copyca")}><span className="start-ca">CA</span><span>Copy CA</span></button>
           <button type="button" className="item" onClick={() => act("howto")}><b>?</b><span>How to buy (wizard)</span></button>
           <button type="button" className="item" onClick={() => act("tg")}><b>TG</b><span>Telegram</span></button>

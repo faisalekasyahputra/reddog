@@ -1,0 +1,44 @@
+{
+  "fetchedAt": "2026-09-04T00:00:00.000Z",
+  "source": "manual",
+  "community": {
+    "name": "snoofi98",
+    "title": "Snoofi Community",
+    "description": "the official $SNOOFI community. mascot enjoyers only.",
+    "subscribers": 1,
+    "activeUsers": 1,
+    "url": "https://www.reddit.com/r/snoofi98/"
+  },
+  "posts": [
+    {
+      "id": "manual-1",
+      "title": "REPLACE WITH YOUR POST TITLE",
+      "author": "No_Dig_876",
+      "score": 1,
+      "commentCount": 0,
+      "createdUtc": 1788739200,
+      "permalink": "https://www.reddit.com/r/snoofi98/",
+      "thumbnail": null
+    },
+    {
+      "id": "manual-2",
+      "title": "REPLACE WITH YOUR POST TITLE",
+      "author": "No_Dig_876",
+      "score": 1,
+      "commentCount": 0,
+      "createdUtc": 1788739200,
+      "permalink": "https://www.reddit.com/r/snoofi98/",
+      "thumbnail": null
+    },
+    {
+      "id": "manual-3",
+      "title": "REPLACE WITH YOUR POST TITLE",
+      "author": "No_Dig_876",
+      "score": 1,
+      "commentCount": 0,
+      "createdUtc": 1788739200,
+      "permalink": "https://www.reddit.com/r/snoofi98/",
+      "thumbnail": null
+    }
+  ]
+}

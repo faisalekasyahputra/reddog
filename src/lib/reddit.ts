@@ -1,6 +1,8 @@
 import "server-only";
 
-export const SUBREDDIT = "solana";
+import { createClient } from "@supabase/supabase-js";
+
+export const SUBREDDIT = "snoofi98";
 const REDDIT_URL = "https://www.reddit.com";
 
 export type RedditCommunity = {
@@ -25,6 +27,7 @@ export type RedditPost = {
 
 export type RedditData = {
   fetchedAt: string;
+  source?: "manual" | "apify";
   community: RedditCommunity;
   posts: RedditPost[];
 };
@@ -185,4 +188,82 @@ export async function fetchRedditCommunity(): Promise<RedditData> {
     if (error instanceof RedditConfigError) throw error;
     throw new RedditUpstreamError();
   }
+}
+
+// ponytail: Apify "last run" dataset -> RedditData. Scheduled on Apify (every 3h), so this read is instant and costs nothing.
+export function shapeApifyData(items: unknown, fetchedAt: string): RedditData {
+  if (!Array.isArray(items)) throw new RedditUpstreamError();
+  const records = items.filter(isRecord);
+  const community = records.find((item) => item.dataType === "community");
+  if (!community) throw new RedditUpstreamError();
+
+  const posts = records
+    .filter((item) => item.dataType === "post")
+    .slice(0, 15)
+    .map((post): RedditPost => ({
+      id: requiredString(post.id),
+      title: requiredString(post.title),
+      author: stringValue(post.username) || "[deleted]",
+      score: optionalNumber(post.upVotes),
+      commentCount: optionalNumber(post.numberOfComments),
+      createdUtc: Math.floor(Date.parse(stringValue(post.createdAt)) / 1000) || 0,
+      permalink: redditUrl(post.url),
+      thumbnail: null,
+    }));
+
+  const url = redditUrl(community.url);
+  return {
+    fetchedAt,
+    source: "apify",
+    community: {
+      name: url.split("/r/")[1]?.split("/")[0] || SUBREDDIT,
+      title: requiredString(community.displayName ?? community.title),
+      description: stringValue(community.description),
+      subscribers: optionalNumber(community.numberOfMembers),
+      activeUsers: optionalNumber(community.weeklyActiveUsers),
+      url,
+    },
+    posts,
+  };
+}
+
+function supabaseAdmin() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) throw new RedditConfigError("Missing Supabase configuration");
+  return createClient(url, key, { auth: { persistSession: false } });
+}
+
+export const FEED_KEY = process.env.NEXT_PUBLIC_PROJECT_SLUG ?? SUBREDDIT;
+
+// Called by the Apify webhook: pull the finished run's dataset, shape it, store one row per project.
+export async function ingestApifyDataset(datasetId: string): Promise<RedditData> {
+  const token = process.env.APIFY_TOKEN;
+  if (!token) throw new RedditConfigError("Missing Apify configuration");
+  const response = await fetch(
+    `https://api.apify.com/v2/datasets/${encodeURIComponent(datasetId)}/items?format=json`,
+    { headers: { Authorization: `Bearer ${token}` }, signal: AbortSignal.timeout(20_000) },
+  );
+  if (!response.ok) throw new RedditUpstreamError();
+  const data = shapeApifyData(await response.json(), new Date().toISOString());
+  const { error } = await supabaseAdmin()
+    .from("reddit_feeds")
+    .upsert({ project_slug: FEED_KEY, data, updated_at: data.fetchedAt });
+  if (error) throw new RedditUpstreamError();
+  return data;
+}
+
+export async function fetchStoredCommunity(): Promise<RedditData> {
+  const { data, error } = await supabaseAdmin()
+    .from("reddit_feeds")
+    .select("data")
+    .eq("project_slug", FEED_KEY)
+    .maybeSingle();
+  if (error) throw new RedditUpstreamError();
+  if (!data) throw new RedditConfigError("No stored feed yet");
+  return data.data as RedditData;
+}
+
+export function fetchCommunity(): Promise<RedditData> {
+  return process.env.REDDIT_CLIENT_ID ? fetchRedditCommunity() : fetchStoredCommunity();
 }

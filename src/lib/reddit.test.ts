@@ -6,12 +6,12 @@ import { fetchRedditCommunity, shapeRedditData } from "./reddit";
 const fetchedAt = "2026-09-04T12:34:56.000Z";
 const aboutFixture = {
   data: {
-    display_name: "solana",
+    display_name: "snoofi98",
     title: "Solana",
     public_description: "Solana discussion",
     subscribers: 123,
     accounts_active: 7,
-    url: "/r/solana/",
+    url: "/r/snoofi98/",
   },
 };
 const postFixture = {
@@ -21,7 +21,7 @@ const postFixture = {
   score: 10,
   num_comments: 2,
   created_utc: 1234567890,
-  permalink: "/r/solana/comments/abc/hello/",
+  permalink: "/r/snoofi98/comments/abc/hello/",
   thumbnail: "self",
 };
 const listingFixture = { data: { children: [{ data: postFixture }] } };
@@ -72,22 +72,22 @@ async function withRedditFetch(
 test("shapeRedditData maps valid payloads and preserves optional defaults", () => {
   const about = {
     data: {
-      display_name: "solana",
+      display_name: "snoofi98",
       title: "Solana",
       subscribers: 123,
-      url: "/r/solana/",
+      url: "/r/snoofi98/",
     },
   };
 
   assert.deepEqual(shapeRedditData(about, listingFixture, fetchedAt), {
     fetchedAt,
     community: {
-      name: "solana",
+      name: "snoofi98",
       title: "Solana",
       description: "",
       subscribers: 123,
       activeUsers: 0,
-      url: "https://www.reddit.com/r/solana/",
+      url: "https://www.reddit.com/r/snoofi98/",
     },
     posts: [
       {
@@ -97,7 +97,7 @@ test("shapeRedditData maps valid payloads and preserves optional defaults", () =
         score: 10,
         commentCount: 2,
         createdUtc: 1234567890,
-        permalink: "https://www.reddit.com/r/solana/comments/abc/hello/",
+        permalink: "https://www.reddit.com/r/snoofi98/comments/abc/hello/",
         thumbnail: null,
       },
     ],
@@ -133,7 +133,7 @@ test("shapeRedditData rejects malformed fields and unsafe Reddit destinations", 
     },
     {
       name: "external community URL",
-      about: { data: { ...aboutFixture.data, url: "https://example.com/r/solana/" } },
+      about: { data: { ...aboutFixture.data, url: "https://example.com/r/snoofi98/" } },
       listing: listingFixture,
     },
     {
@@ -159,8 +159,8 @@ test("fetchRedditCommunity sends the OAuth flow, caps posts, and timestamps the 
       ...postFixture,
       id: `post-${index}`,
       permalink: index === 1
-        ? "https://www.reddit.com/r/solana/comments/post-1/title/"
-        : `/r/solana/comments/post-${index}/title/`,
+        ? "https://www.reddit.com/r/snoofi98/comments/post-1/title/"
+        : `/r/snoofi98/comments/post-${index}/title/`,
     },
   }));
 
@@ -192,8 +192,8 @@ test("fetchRedditCommunity sends the OAuth flow, caps posts, and timestamps the 
       "User-Agent": "reddog-tests/1.0",
     });
     assert.deepEqual(redditCalls.map(({ url }) => url).sort(), [
-      "https://oauth.reddit.com/r/solana/about?raw_json=1",
-      "https://oauth.reddit.com/r/solana/hot?limit=15&raw_json=1",
+      "https://oauth.reddit.com/r/snoofi98/about?raw_json=1",
+      "https://oauth.reddit.com/r/snoofi98/hot?limit=15&raw_json=1",
     ]);
     for (const call of redditCalls) {
       assert.deepEqual(call.init?.headers, {
@@ -203,9 +203,9 @@ test("fetchRedditCommunity sends the OAuth flow, caps posts, and timestamps the 
     }
     assert.deepEqual(timeouts, [10_000, 10_000, 10_000]);
     assert.equal(data.posts.length, 15);
-    assert.equal(data.posts[0].permalink, "https://www.reddit.com/r/solana/comments/post-0/title/");
-    assert.equal(data.posts[1].permalink, "https://www.reddit.com/r/solana/comments/post-1/title/");
-    assert.equal(data.community.url, "https://www.reddit.com/r/solana/");
+    assert.equal(data.posts[0].permalink, "https://www.reddit.com/r/snoofi98/comments/post-0/title/");
+    assert.equal(data.posts[1].permalink, "https://www.reddit.com/r/snoofi98/comments/post-1/title/");
+    assert.equal(data.community.url, "https://www.reddit.com/r/snoofi98/");
     assert(Date.parse(data.fetchedAt) >= before);
     assert(Date.parse(data.fetchedAt) <= after);
   });
@@ -226,4 +226,17 @@ test("fetchRedditCommunity normalizes timeouts", async () => {
   }, async () => {
     await assert.rejects(fetchRedditCommunity(), assertSafeUpstreamError);
   });
+});
+
+test("shapeApifyData maps Apify dataset items into RedditData", async () => {
+  const { shapeApifyData } = await import("./reddit");
+  const data = shapeApifyData([
+    { dataType: "community", displayName: "Snoofi Community", description: "desc", numberOfMembers: 12, weeklyActiveUsers: 3, url: "https://www.reddit.com/r/snoofi98/" },
+    { dataType: "post", id: "t3_a", title: "hello world", username: "No_Dig_876", upVotes: 5, numberOfComments: 2, createdAt: "2026-09-03T10:00:00.000Z", url: "https://www.reddit.com/r/snoofi98/comments/a/hello_world/" },
+  ], "2026-09-04T00:00:00.000Z");
+  assert.equal(data.source, "apify");
+  assert.equal(data.community.name, "snoofi98");
+  assert.equal(data.community.subscribers, 12);
+  assert.deepEqual(data.posts.map((p) => [p.title, p.author, p.score, p.commentCount]), [["hello world", "No_Dig_876", 5, 2]]);
+  assert.throws(() => shapeApifyData([{ dataType: "post", id: "x", title: "no community", url: "https://www.reddit.com/r/x/" }], "now"));
 });

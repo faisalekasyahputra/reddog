@@ -1,27 +1,24 @@
 import { unstable_cache } from "next/cache";
 
-import { fetchRedditCommunity, RedditConfigError, SUBREDDIT } from "@/lib/reddit";
+import manualFeed from "@/lib/reddit-manual.json";
+import { fetchCommunity, RedditConfigError, SUBREDDIT } from "@/lib/reddit";
 
 export const runtime = "nodejs";
 
 const getCachedReddit = unstable_cache(
-  fetchRedditCommunity,
+  fetchCommunity,
   ["reddit", SUBREDDIT],
-  { revalidate: 60 },
+  { revalidate: 60, tags: ["reddit"] },
 );
 
 export async function GET() {
   try {
     return Response.json(await getCachedReddit());
   } catch (error) {
-    const isConfigError = error instanceof RedditConfigError;
-    console.error("Reddit community fetch failed", isConfigError
-      ? { name: error.name, message: error.message }
-      : { name: "RedditUpstreamError", message: "Upstream Reddit failure" });
+    // ponytail: neither Reddit OAuth nor Apify configured -> hand-maintained feed
+    if (error instanceof RedditConfigError) return Response.json(manualFeed);
+    console.error("Reddit community fetch failed", { name: "RedditUpstreamError", message: "Upstream Reddit failure" });
 
-    return Response.json(
-      { error: "Unable to load Reddit community." },
-      { status: isConfigError ? 500 : 502 },
-    );
+    return Response.json({ error: "Unable to load Reddit community." }, { status: 502 });
   }
 }

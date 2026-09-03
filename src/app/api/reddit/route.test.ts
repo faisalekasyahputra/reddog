@@ -27,15 +27,15 @@ async function getWithCacheError(error: Error) {
   }
 }
 
-test("GET maps Reddit configuration failures to the safe 500 contract", async () => {
+test("GET serves the manual feed when Reddit is not configured", async () => {
   const { response } = await getWithCacheError(
     new RedditConfigError("Missing Reddit configuration"),
   );
 
-  assert.equal(response.status, 500);
-  assert.deepEqual(await response.json(), {
-    error: "Unable to load Reddit community.",
-  });
+  assert.equal(response.status, 200);
+  const body = await response.json();
+  assert.equal(body.source, "manual");
+  assert.equal(body.community.name, "snoofi98");
 });
 
 test("GET never logs raw upstream error content", async () => {
