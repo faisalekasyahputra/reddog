@@ -85,12 +85,7 @@ export default function Desktop({ subreddit }: { subreddit: string }) {
   const chartEmbed = dexEmbedUrl(config?.dexscreener_url);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [muted, setMuted] = useState(true);
-  const toggleMute = () => {
-    const video = videoRef.current;
-    if (!video) return;
-    video.muted = !video.muted;
-    setMuted(video.muted);
-  };
+  const toggleMute = () => setMuted((current) => !current);
   // telegram_url doubles as the reddit source when it points at reddit.com (see lib/reddit.ts)
   const telegramUrl = config?.telegram_url && !/reddit\.com/i.test(config.telegram_url) ? config.telegram_url : null;
   const links = [
@@ -455,6 +450,15 @@ void main(){
             <line x1="11" y1="19" x2="21" y2="19" stroke="#ff8717" strokeWidth="2" />
             <line x1="11" y1="24" x2="17" y2="24" stroke="#ff8717" strokeWidth="2" />
           </g>
+          <g id="i-vol">
+            <path d="M6 12 h5 l7 -6 v20 l-7 -6 H6 z" fill="currentColor" />
+            <path d="M22 11 a9 9 0 0 1 0 10" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+            <path d="M26 7 a15 15 0 0 1 0 18" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+          </g>
+          <g id="i-mute">
+            <path d="M6 12 h5 l7 -6 v20 l-7 -6 H6 z" fill="currentColor" />
+            <path d="M22 11 l9 10 M31 11 l-9 10" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+          </g>
           <g id="i-globe">
             <circle cx="16" cy="16" r="13" fill="none" stroke="#fff" strokeWidth="2.5" />
             <ellipse cx="16" cy="16" rx="6" ry="13" fill="none" stroke="#fff" strokeWidth="2" />
@@ -554,8 +558,8 @@ void main(){
                   <div className="sechead"><h2>VIDEO</h2><div className="rule" /></div>
                   <div className="player">
                     <div className="pbar"><span>snoofi.mp4</span><span>1998 kbps</span></div>
-                    <div className="slot vid sunken"><video ref={videoRef} src="/assets/video/snoofi-hero.mp4" autoPlay muted loop playsInline controls preload="metadata" aria-label="Snoofi hero video" /></div>
-                    <div className="controls"><button type="button" aria-label="play" onClick={() => void videoRef.current?.play()}>&#9658;</button><button type="button" aria-label="pause" onClick={() => videoRef.current?.pause()}>&#10074;&#10074;</button><button type="button" onClick={toggleMute}>{muted ? "Unmute" : "Mute"}</button><div className="track" /></div>
+                    <div className="slot vid sunken"><video ref={videoRef} src="/assets/video/snoofi-hero.mp4" autoPlay muted={muted} loop playsInline controls preload="metadata" aria-label="Snoofi hero video" /></div>
+                    <div className="controls"><button type="button" aria-label="play" onClick={() => void videoRef.current?.play()}>&#9658;</button><button type="button" aria-label="pause" onClick={() => videoRef.current?.pause()}>&#10074;&#10074;</button><button type="button" aria-label={muted ? "Unmute" : "Mute"} title={muted ? "Unmute" : "Mute"} onClick={toggleMute}><svg className="volico" width="14" height="14" viewBox="0 0 32 32"><use href={muted ? "#i-mute" : "#i-vol"} /></svg></button><div className="track" /></div>
                   </div>
                 </section>
 

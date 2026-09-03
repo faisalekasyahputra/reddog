@@ -150,3 +150,4 @@ section{margin-bottom:26px}
 @media (prefers-reduced-motion:reduce){.bootbar .segs{animation-duration:2.4s}}
 @media (max-width:1150px){#community{display:none!important}#browser{width:min(1240px,calc(100vw - 118px))}}
 @media (max-width:780px){.r-side{display:none}#browser{left:6px;width:calc(100vw - 12px)}.dicons{flex-direction:row;top:auto;bottom:40px;gap:8px}.slot.hero{height:200px}}
+.player .controls .volico{display:block;color:currentColor}
